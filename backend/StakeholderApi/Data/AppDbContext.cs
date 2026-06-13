@@ -8,11 +8,16 @@ public class AppDbContext : DbContext
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
     public DbSet<Stakeholder> Stakeholders => Set<Stakeholder>();
+    public DbSet<User> Users => Set<User>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Stakeholder>()
             .HasIndex(s => s.Email)
+            .IsUnique();
+
+        modelBuilder.Entity<User>()
+            .HasIndex(u => u.Email)
             .IsUnique();
 
         modelBuilder.Entity<Stakeholder>().HasData(GenerateSeedData());
