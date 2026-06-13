@@ -4,15 +4,19 @@ using StakeholderApi.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// API layer
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+// Database
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlite("Data Source=stakeholders.db"));
 
+// Application services
 builder.Services.AddScoped<IStakeholderService, StakeholderService>();
 
+// CORS — allows the React dev server to call the API
 builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(policy =>
@@ -25,10 +29,10 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
+// Run any pending EF Core migrations on startup
 using (var scope = app.Services.CreateScope())
 {
-    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    db.Database.Migrate();
+    scope.ServiceProvider.GetRequiredService<AppDbContext>().Database.Migrate();
 }
 
 if (app.Environment.IsDevelopment())

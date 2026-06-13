@@ -11,32 +11,41 @@ public class AppDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        var firstNames = new[] { "Alice", "Bob", "Carol", "David", "Eva", "Frank", "Grace", "Henry", "Isla", "James" };
-        var lastNames = new[] { "Johnson", "Williams", "Smith", "Brown", "Taylor", "Anderson", "Thomas", "Jackson", "White", "Harris" };
-        var roles = new[] { "Investor", "Advisor", "Partner", "Board Member", "Mentor" };
-        var organisations = new[] { "Venture Capital Partners", "TechCorp Ltd", "Innovation Hub", "Global Ventures", "Apex Advisory", "Horizon Capital", "BluePeak Group", "Meridian Partners", "Summit Advisors", "Crestwood Holdings" };
+        modelBuilder.Entity<Stakeholder>()
+            .HasIndex(s => s.Email)
+            .IsUnique();
 
+        modelBuilder.Entity<Stakeholder>().HasData(GenerateSeedData());
+    }
+
+    private static List<Stakeholder> GenerateSeedData()
+    {
+        var firstNames = new[] { "Alice", "Bob", "Carol", "David", "Eva", "Frank", "Grace", "Henry", "Isla", "James" };
+        var lastNames  = new[] { "Johnson", "Williams", "Smith", "Brown", "Taylor", "Anderson", "Thomas", "Jackson", "White", "Harris" };
+        var roles      = new[] { "Investor", "Advisor", "Partner", "Board Member", "Mentor" };
+        var orgs       = new[] { "Venture Capital Partners", "TechCorp Ltd", "Innovation Hub", "Global Ventures", "Apex Advisory", "Horizon Capital", "BluePeak Group", "Meridian Partners", "Summit Advisors", "Crestwood Holdings" };
+
+        var startDate    = new DateTime(2024, 1, 1, 0, 0, 0, DateTimeKind.Utc);
         var stakeholders = new List<Stakeholder>();
-        var createdAt = new DateTime(2024, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 
         for (int i = 0; i < 50; i++)
         {
             var firstName = firstNames[i % firstNames.Length];
-            var lastName = lastNames[i / firstNames.Length % lastNames.Length];
-            var suffix = i < firstNames.Length * lastNames.Length ? "" : $"{i / (firstNames.Length * lastNames.Length) + 1}";
+            var lastName  = lastNames[i / firstNames.Length];
 
             stakeholders.Add(new Stakeholder
             {
-                Id = i + 1,
-                FirstName = firstName,
-                LastName = lastName + suffix,
-                Email = $"{firstName.ToLower()}.{lastName.ToLower()}{suffix}@example.com",
-                Role = roles[i % roles.Length],
-                Organisation = organisations[i % organisations.Length],
-                CreatedAt = createdAt.AddDays(i * 7)
+                Id           = i + 1,
+                FirstName    = firstName,
+                LastName     = lastName,
+                Email        = $"{firstName.ToLower()}.{lastName.ToLower()}@example.com",
+                Role         = roles[i % roles.Length],
+                Organisation = orgs[i % orgs.Length],
+                CreatedAt    = startDate.AddDays(i * 7),
+                Title        = i % 2 == 0 ? "Ms" : "Mr",
             });
         }
 
-        modelBuilder.Entity<Stakeholder>().HasData(stakeholders);
+        return stakeholders;
     }
 }
