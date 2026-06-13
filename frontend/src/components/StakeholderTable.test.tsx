@@ -124,7 +124,7 @@ describe('StakeholderTable', () => {
     const onPageChange = vi.fn();
     renderTable(makeMockStakeholders(10), { totalCount: 15, currentPage: 1, onPageChange });
 
-    fireEvent.click(screen.getByRole('button', { name: 'Next page' }));
+    fireEvent.click(screen.getByLabelText('Go to next page'));
 
     expect(onPageChange).toHaveBeenCalledWith(2);
   });
@@ -132,14 +132,14 @@ describe('StakeholderTable', () => {
   it('disables Previous button on the first page', () => {
     renderTable(makeMockStakeholders(10), { currentPage: 1, totalCount: 15 });
 
-    expect(screen.getByRole('button', { name: 'Previous page' })).toBeDisabled();
+    expect(screen.getByLabelText('Go to previous page')).toHaveAttribute('aria-disabled', 'true');
   });
 
   it('disables Next button on the last page', () => {
     // totalCount=15, pageSize=10 → totalPages=2; currentPage=2 is the last page
     renderTable(makeMockStakeholders(5), { totalCount: 15, currentPage: 2, pageSize: 10 });
 
-    expect(screen.getByRole('button', { name: 'Next page' })).toBeDisabled();
+    expect(screen.getByLabelText('Go to next page')).toHaveAttribute('aria-disabled', 'true');
   });
 
   it('calls onPageSizeChange when a page size option is clicked', () => {

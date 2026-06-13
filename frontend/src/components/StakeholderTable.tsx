@@ -1,15 +1,9 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
+import type { ColumnDef } from '@tanstack/react-table';
 import { Stakeholder } from '../types/stakeholder';
 import { deleteStakeholder } from '../services/stakeholderService';
 import { EditStakeholderDialog } from './EditStakeholderDialog';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
+import { DataTable } from '@/components/ui/data-table';
 import { Button } from '@/components/ui/button';
 import {
   AlertDialog,
@@ -21,9 +15,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { ChevronLeft, ChevronRight, Pencil, Trash2 } from 'lucide-react';
-
-const PAGE_SIZE_OPTIONS = [5, 10, 25] as const;
+import { Pencil, Trash2 } from 'lucide-react';
 
 interface Props {
   stakeholders: Stakeholder[];
@@ -65,15 +57,62 @@ export function StakeholderTable({
     }
   }
 
-  if (totalCount === 0) {
-    return (
-      <div className="rounded-lg border bg-card px-6 py-12 text-center text-muted-foreground shadow-sm">
-        No stakeholders found.
-      </div>
-    );
-  }
-
-  const totalPages = Math.ceil(totalCount / pageSize);
+  const columns = useMemo<ColumnDef<Stakeholder>[]>(
+    () => [
+      {
+        accessorKey: 'title',
+        header: 'Title',
+        cell: ({ row }) => (
+          <span className="text-muted-foreground">{row.original.title ?? '-'}</span>
+        ),
+      },
+      {
+        accessorKey: 'firstName',
+        header: 'First Name',
+        cell: ({ row }) => <span className="font-medium">{row.original.firstName}</span>,
+      },
+      { accessorKey: 'lastName', header: 'Last Name' },
+      {
+        accessorKey: 'email',
+        header: 'Email',
+        cell: ({ row }) => (
+          <span className="text-muted-foreground">{row.original.email}</span>
+        ),
+      },
+      { accessorKey: 'role', header: 'Role' },
+      { accessorKey: 'organisation', header: 'Organisation' },
+      {
+        id: 'actions',
+        header: () => <span className="sr-only">Actions</span>,
+        cell: ({ row }) => {
+          const s = row.original;
+          return (
+            <div className="flex justify-end gap-1">
+              <Button
+                variant="ghost"
+                size="icon-sm"
+                onClick={() => setEditingStakeholder(s)}
+                aria-label={`Edit ${s.firstName} ${s.lastName}`}
+              >
+                <Pencil />
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon-sm"
+                onClick={() => { setDeleteError(null); setDeletingStakeholder(s); }}
+                aria-label={`Delete ${s.firstName} ${s.lastName}`}
+                className="text-destructive hover:text-destructive hover:bg-destructive/10"
+              >
+                <Trash2 />
+              </Button>
+            </div>
+          );
+        },
+        enableSorting: false,
+      },
+    ],
+    [],
+  );
 
   return (
     <div className="space-y-4">
@@ -83,99 +122,16 @@ export function StakeholderTable({
         </div>
       )}
 
-      <div className="rounded-lg border bg-card shadow-sm overflow-hidden">
-        <Table>
-          <TableHeader>
-            <TableRow className="bg-muted/50 hover:bg-muted/50">
-              <TableHead className="font-semibold text-foreground/70">Title</TableHead>
-              <TableHead className="font-semibold text-foreground/70">First Name</TableHead>
-              <TableHead className="font-semibold text-foreground/70">Last Name</TableHead>
-              <TableHead className="font-semibold text-foreground/70">Email</TableHead>
-              <TableHead className="font-semibold text-foreground/70">Role</TableHead>
-              <TableHead className="font-semibold text-foreground/70">Organisation</TableHead>
-              <TableHead className="font-semibold text-foreground/70 w-20 text-right">Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {stakeholders.map((s) => (
-              <TableRow key={s.id} className="hover:bg-muted/30 transition-colors">
-                <TableCell className="text-muted-foreground">{s.title ?? '-'}</TableCell>
-                <TableCell className="font-medium">{s.firstName}</TableCell>
-                <TableCell>{s.lastName}</TableCell>
-                <TableCell className="text-muted-foreground">{s.email}</TableCell>
-                <TableCell>{s.role}</TableCell>
-                <TableCell>{s.organisation}</TableCell>
-                <TableCell className="text-right">
-                  <div className="flex justify-end gap-1">
-                    <Button
-                      variant="ghost"
-                      size="icon-sm"
-                      onClick={() => setEditingStakeholder(s)}
-                      aria-label={`Edit ${s.firstName} ${s.lastName}`}
-                    >
-                      <Pencil />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon-sm"
-                      onClick={() => { setDeleteError(null); setDeletingStakeholder(s); }}
-                      aria-label={`Delete ${s.firstName} ${s.lastName}`}
-                      className="text-destructive hover:text-destructive hover:bg-destructive/10"
-                    >
-                      <Trash2 />
-                    </Button>
-                  </div>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </div>
-
-      <div className="flex items-center justify-between px-1">
-        <div className="flex items-center gap-2">
-          <span className="text-sm text-muted-foreground">Rows per page:</span>
-          {PAGE_SIZE_OPTIONS.map((size) => (
-            <Button
-              key={size}
-              variant={pageSize === size ? 'default' : 'ghost'}
-              size="sm"
-              onClick={() => onPageSizeChange(size)}
-              aria-pressed={pageSize === size}
-              className="h-8 w-8 p-0"
-            >
-              {size}
-            </Button>
-          ))}
-        </div>
-        <div className="flex items-center gap-3">
-          <span className="text-sm text-muted-foreground" aria-live="polite">
-            Page {currentPage} of {totalPages}
-          </span>
-          <div className="flex gap-1">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => onPageChange(currentPage - 1)}
-              disabled={currentPage === 1}
-              aria-label="Previous page"
-              className="h-8 w-8 p-0"
-            >
-              <ChevronLeft className="h-4 w-4" />
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => onPageChange(currentPage + 1)}
-              disabled={currentPage === totalPages}
-              aria-label="Next page"
-              className="h-8 w-8 p-0"
-            >
-              <ChevronRight className="h-4 w-4" />
-            </Button>
-          </div>
-        </div>
-      </div>
+      <DataTable
+        columns={columns}
+        data={stakeholders}
+        totalCount={totalCount}
+        currentPage={currentPage}
+        pageSize={pageSize}
+        onPageChange={onPageChange}
+        onPageSizeChange={onPageSizeChange}
+        emptyMessage="No stakeholders found."
+      />
 
       <EditStakeholderDialog
         stakeholder={editingStakeholder}

@@ -2,11 +2,11 @@ import { z } from 'zod';
 
 export const stakeholderSchema = z.object({
   id: z.number(),
-  firstName: z.string(),
-  lastName: z.string(),
+  firstName: z.string().min(2).max(100),
+  lastName: z.string().min(2).max(100),
   email: z.string().email(),
-  role: z.string(),
-  organisation: z.string(),
+  role: z.string().min(2).max(100),
+  organisation: z.string().min(2).max(100),
   createdAt: z.string(),
   title: z.string().optional(),
 });
