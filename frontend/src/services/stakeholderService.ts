@@ -1,18 +1,18 @@
-import { stakeholderArraySchema, stakeholderSchema } from '../schemas/stakeholder';
+import { pagedStakeholderSchema, PagedStakeholders, stakeholderSchema } from '../schemas/stakeholder';
 import { Stakeholder } from '../types/stakeholder';
 
 // Override via VITE_API_URL in .env for non-local environments.
 const API_BASE_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:5000/api';
 
-export async function getStakeholders(): Promise<Stakeholder[]> {
-  const response = await fetch(`${API_BASE_URL}/stakeholders`);
+export async function getStakeholders(page = 0, pageSize = 10): Promise<PagedStakeholders> {
+  const response = await fetch(`${API_BASE_URL}/stakeholders?page=${page}&pageSize=${pageSize}`);
 
   if (!response.ok) {
     throw new Error('Failed to fetch stakeholders');
   }
 
   const data = await response.json();
-  return stakeholderArraySchema.parse(data);
+  return pagedStakeholderSchema.parse(data);
 }
 
 export type CreateStakeholderInput = {

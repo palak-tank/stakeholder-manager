@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { Stakeholder } from '../types/stakeholder';
 import {
   Table,
@@ -15,13 +14,22 @@ const PAGE_SIZE_OPTIONS = [5, 10, 25] as const;
 
 interface Props {
   stakeholders: Stakeholder[];
+  totalCount: number;
+  currentPage: number;
+  pageSize: number;
+  onPageChange: (page: number) => void;
+  onPageSizeChange: (size: number) => void;
 }
 
-export function StakeholderTable({ stakeholders }: Props) {
-  const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState<number>(10);
-
-  if (stakeholders.length === 0) {
+export function StakeholderTable({
+  stakeholders,
+  totalCount,
+  currentPage,
+  pageSize,
+  onPageChange,
+  onPageSizeChange,
+}: Props) {
+  if (totalCount === 0) {
     return (
       <div className="rounded-lg border bg-card px-6 py-12 text-center text-muted-foreground shadow-sm">
         No stakeholders found.
@@ -29,14 +37,7 @@ export function StakeholderTable({ stakeholders }: Props) {
     );
   }
 
-  const totalPages = Math.ceil(stakeholders.length / pageSize);
-  const start = (currentPage - 1) * pageSize;
-  const paginated = stakeholders.slice(start, start + pageSize);
-
-  const handlePageSizeChange = (size: number) => {
-    setPageSize(size);
-    setCurrentPage(1);
-  };
+  const totalPages = Math.ceil(totalCount / pageSize);
 
   return (
     <div className="space-y-4">
@@ -53,7 +54,7 @@ export function StakeholderTable({ stakeholders }: Props) {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {paginated.map((s) => (
+            {stakeholders.map((s) => (
               <TableRow key={s.id} className="hover:bg-muted/30 transition-colors">
                 <TableCell className="text-muted-foreground">{s.title ?? '-'}</TableCell>
                 <TableCell className="font-medium">{s.firstName}</TableCell>
@@ -75,7 +76,7 @@ export function StakeholderTable({ stakeholders }: Props) {
               key={size}
               variant={pageSize === size ? 'default' : 'ghost'}
               size="sm"
-              onClick={() => handlePageSizeChange(size)}
+              onClick={() => onPageSizeChange(size)}
               aria-pressed={pageSize === size}
               className="h-8 w-8 p-0"
             >
@@ -91,7 +92,7 @@ export function StakeholderTable({ stakeholders }: Props) {
             <Button
               variant="outline"
               size="sm"
-              onClick={() => setCurrentPage((p) => p - 1)}
+              onClick={() => onPageChange(currentPage - 1)}
               disabled={currentPage === 1}
               aria-label="Previous page"
               className="h-8 w-8 p-0"
@@ -101,7 +102,7 @@ export function StakeholderTable({ stakeholders }: Props) {
             <Button
               variant="outline"
               size="sm"
-              onClick={() => setCurrentPage((p) => p + 1)}
+              onClick={() => onPageChange(currentPage + 1)}
               disabled={currentPage === totalPages}
               aria-label="Next page"
               className="h-8 w-8 p-0"

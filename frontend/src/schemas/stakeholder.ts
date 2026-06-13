@@ -12,3 +12,10 @@ export const stakeholderSchema = z.object({
 });
 
 export const stakeholderArraySchema = z.array(stakeholderSchema);
+
+export const pagedStakeholderSchema = z.object({
+  items: stakeholderArraySchema,
+  totalCount: z.number(),
+});
+
+export type PagedStakeholders = z.infer<typeof pagedStakeholderSchema>;

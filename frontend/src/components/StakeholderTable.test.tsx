@@ -1,5 +1,5 @@
 import { render, screen, fireEvent } from '@testing-library/react';
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { StakeholderTable } from './StakeholderTable';
 import { Stakeholder } from '../types/stakeholder';
 
@@ -39,9 +39,31 @@ function makeMockStakeholders(count: number): Stakeholder[] {
   }));
 }
 
+function renderTable(
+  stakeholders: Stakeholder[],
+  overrides: {
+    totalCount?: number;
+    currentPage?: number;
+    pageSize?: number;
+    onPageChange?: (page: number) => void;
+    onPageSizeChange?: (size: number) => void;
+  } = {}
+) {
+  render(
+    <StakeholderTable
+      stakeholders={stakeholders}
+      totalCount={overrides.totalCount ?? stakeholders.length}
+      currentPage={overrides.currentPage ?? 1}
+      pageSize={overrides.pageSize ?? 10}
+      onPageChange={overrides.onPageChange ?? vi.fn()}
+      onPageSizeChange={overrides.onPageSizeChange ?? vi.fn()}
+    />
+  );
+}
+
 describe('StakeholderTable', () => {
   it('renders a row for each stakeholder', () => {
-    render(<StakeholderTable stakeholders={mockStakeholders} />);
+    renderTable(mockStakeholders);
 
     expect(screen.getByText('Alice')).toBeInTheDocument();
     expect(screen.getByText('Johnson')).toBeInTheDocument();
@@ -51,7 +73,7 @@ describe('StakeholderTable', () => {
   });
 
   it('renders the correct column headers', () => {
-    render(<StakeholderTable stakeholders={mockStakeholders} />);
+    renderTable(mockStakeholders);
 
     expect(screen.getByText('Title')).toBeInTheDocument();
     expect(screen.getByText('First Name')).toBeInTheDocument();
@@ -62,70 +84,66 @@ describe('StakeholderTable', () => {
   });
 
   it('renders the title for each stakeholder', () => {
-    render(<StakeholderTable stakeholders={mockStakeholders} />);
+    renderTable(mockStakeholders);
 
     expect(screen.getByText('Ms')).toBeInTheDocument();
     expect(screen.getByText('Mr')).toBeInTheDocument();
   });
 
   it('renders - when title is not set', () => {
-    const stakeholders: Stakeholder[] = [
-      { ...mockStakeholders[0], title: undefined },
-    ];
-    render(<StakeholderTable stakeholders={stakeholders} />);
+    renderTable([{ ...mockStakeholders[0], title: undefined }]);
 
     expect(screen.getByText('-')).toBeInTheDocument();
   });
 
   it('displays a message when there are no stakeholders', () => {
-    render(<StakeholderTable stakeholders={[]} />);
+    renderTable([], { totalCount: 0 });
 
     expect(screen.getByText('No stakeholders found.')).toBeInTheDocument();
   });
 
   it('does not render a table when there are no stakeholders', () => {
-    render(<StakeholderTable stakeholders={[]} />);
+    renderTable([], { totalCount: 0 });
 
     expect(screen.queryByRole('table')).not.toBeInTheDocument();
   });
 
-  it('shows only the first page of results', () => {
-    render(<StakeholderTable stakeholders={makeMockStakeholders(15)} />);
+  it('renders only the items it receives from the server', () => {
+    // Server returns page 1 (10 items); item at index 10 is not in this page
+    renderTable(makeMockStakeholders(10), { totalCount: 15 });
 
     expect(screen.getByText('First0')).toBeInTheDocument();
     expect(screen.queryByText('First10')).not.toBeInTheDocument();
   });
 
-  it('navigates to the next page', () => {
-    render(<StakeholderTable stakeholders={makeMockStakeholders(15)} />);
+  it('calls onPageChange with the next page number when Next is clicked', () => {
+    const onPageChange = vi.fn();
+    renderTable(makeMockStakeholders(10), { totalCount: 15, currentPage: 1, onPageChange });
 
     fireEvent.click(screen.getByRole('button', { name: 'Next page' }));
 
-    expect(screen.queryByText('First0')).not.toBeInTheDocument();
-    expect(screen.getByText('First10')).toBeInTheDocument();
+    expect(onPageChange).toHaveBeenCalledWith(2);
   });
 
   it('disables Previous button on the first page', () => {
-    render(<StakeholderTable stakeholders={makeMockStakeholders(15)} />);
+    renderTable(makeMockStakeholders(10), { currentPage: 1, totalCount: 15 });
 
     expect(screen.getByRole('button', { name: 'Previous page' })).toBeDisabled();
   });
 
   it('disables Next button on the last page', () => {
-    render(<StakeholderTable stakeholders={makeMockStakeholders(15)} />);
-
-    fireEvent.click(screen.getByRole('button', { name: 'Next page' }));
+    // totalCount=15, pageSize=10 → totalPages=2; currentPage=2 is the last page
+    renderTable(makeMockStakeholders(5), { totalCount: 15, currentPage: 2, pageSize: 10 });
 
     expect(screen.getByRole('button', { name: 'Next page' })).toBeDisabled();
   });
 
-  it('changes page size and resets to page 1', () => {
-    render(<StakeholderTable stakeholders={makeMockStakeholders(15)} />);
+  it('calls onPageSizeChange when a page size option is clicked', () => {
+    const onPageSizeChange = vi.fn();
+    renderTable(makeMockStakeholders(10), { totalCount: 15, onPageSizeChange });
 
-    fireEvent.click(screen.getByRole('button', { name: 'Next page' }));
     fireEvent.click(screen.getByRole('button', { name: '25' }));
 
-    expect(screen.getByText('First0')).toBeInTheDocument();
-    expect(screen.getByText('First14')).toBeInTheDocument();
+    expect(onPageSizeChange).toHaveBeenCalledWith(25);
   });
 });
