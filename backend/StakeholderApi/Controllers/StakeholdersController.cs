@@ -16,9 +16,11 @@ public class StakeholdersController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<Stakeholder>>> GetAll()
+    public async Task<ActionResult<PagedResult<Stakeholder>>> GetAll(
+        [FromQuery] int page = 0,
+        [FromQuery] int pageSize = 10)
     {
-        return Ok(await _stakeholderService.GetAllStakeholdersAsync());
+        return Ok(await _stakeholderService.GetAllStakeholdersAsync(page, pageSize));
     }
 
     [HttpPost]

@@ -13,11 +13,15 @@ public class StakeholderService : IStakeholderService
         _context = context;
     }
 
-    public async Task<IEnumerable<Stakeholder>> GetAllStakeholdersAsync()
+    public async Task<PagedResult<Stakeholder>> GetAllStakeholdersAsync(int page, int pageSize)
     {
-        return await _context.Stakeholders
+        var total = await _context.Stakeholders.CountAsync();
+        var items = await _context.Stakeholders
             .OrderBy(s => s.LastName)
+            .Skip(page * pageSize)
+            .Take(pageSize)
             .ToListAsync();
+        return new PagedResult<Stakeholder>(items, total);
     }
 
     public async Task<Stakeholder> CreateStakeholderAsync(Stakeholder stakeholder)

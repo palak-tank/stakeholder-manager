@@ -29,9 +29,10 @@ public class StakeholderServiceTests
 
         var service = new StakeholderService(context);
 
-        var result = await service.GetAllStakeholdersAsync();
+        var result = await service.GetAllStakeholdersAsync(0, 10);
 
-        Assert.Equal(2, result.Count());
+        Assert.Equal(2, result.Items.Count());
+        Assert.Equal(2, result.TotalCount);
     }
 
     [Fact]
@@ -40,9 +41,10 @@ public class StakeholderServiceTests
         using var context = CreateInMemoryContext(nameof(GetAllStakeholdersAsync_WhenNoStakeholders_ReturnsEmptyList));
         var service = new StakeholderService(context);
 
-        var result = await service.GetAllStakeholdersAsync();
+        var result = await service.GetAllStakeholdersAsync(0, 10);
 
-        Assert.Empty(result);
+        Assert.Empty(result.Items);
+        Assert.Equal(0, result.TotalCount);
     }
 
     [Fact]
@@ -58,7 +60,7 @@ public class StakeholderServiceTests
 
         var service = new StakeholderService(context);
 
-        var result = (await service.GetAllStakeholdersAsync()).ToList();
+        var result = (await service.GetAllStakeholdersAsync(0, 10)).Items.ToList();
 
         Assert.Equal("Adams", result[0].LastName);
         Assert.Equal("Johnson", result[1].LastName);
@@ -84,7 +86,7 @@ public class StakeholderServiceTests
 
         var service = new StakeholderService(context);
 
-        var result = (await service.GetAllStakeholdersAsync()).Single();
+        var result = (await service.GetAllStakeholdersAsync(0, 10)).Items.Single();
 
         Assert.Equal("Alice", result.FirstName);
         Assert.Equal("Johnson", result.LastName);

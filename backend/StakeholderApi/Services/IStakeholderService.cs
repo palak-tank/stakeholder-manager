@@ -4,6 +4,6 @@ namespace StakeholderApi.Services;
 
 public interface IStakeholderService
 {
-    Task<IEnumerable<Stakeholder>> GetAllStakeholdersAsync();
+    Task<PagedResult<Stakeholder>> GetAllStakeholdersAsync(int page, int pageSize);
     Task<Stakeholder> CreateStakeholderAsync(Stakeholder stakeholder);
 }
