@@ -1,36 +1,116 @@
+import { useState } from 'react';
 import { Stakeholder } from '../types/stakeholder';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import { Button } from '@/components/ui/button';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
+
+const PAGE_SIZE_OPTIONS = [5, 10, 25] as const;
 
 interface Props {
   stakeholders: Stakeholder[];
 }
 
 export function StakeholderTable({ stakeholders }: Props) {
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState<number>(10);
+
   if (stakeholders.length === 0) {
-    return <p className="empty-message">No stakeholders found.</p>;
+    return (
+      <div className="rounded-lg border bg-card px-6 py-12 text-center text-muted-foreground shadow-sm">
+        No stakeholders found.
+      </div>
+    );
   }
 
+  const totalPages = Math.ceil(stakeholders.length / pageSize);
+  const start = (currentPage - 1) * pageSize;
+  const paginated = stakeholders.slice(start, start + pageSize);
+
+  const handlePageSizeChange = (size: number) => {
+    setPageSize(size);
+    setCurrentPage(1);
+  };
+
   return (
-    <table className="stakeholder-table">
-      <thead>
-        <tr>
-          <th>First Name</th>
-          <th>Last Name</th>
-          <th>Email</th>
-          <th>Role</th>
-          <th>Organisation</th>
-        </tr>
-      </thead>
-      <tbody>
-        {stakeholders.map((s) => (
-          <tr key={s.id}>
-            <td>{s.firstName}</td>
-            <td>{s.lastName}</td>
-            <td>{s.email}</td>
-            <td>{s.organisation}</td>
-            <td>{s.role}</td>
-          </tr>
-        ))}
-      </tbody>
-    </table>
+    <div className="space-y-4">
+      <div className="rounded-lg border bg-card shadow-sm overflow-hidden">
+        <Table>
+          <TableHeader>
+            <TableRow className="bg-muted/50 hover:bg-muted/50">
+              <TableHead className="font-semibold text-foreground/70">Title</TableHead>
+              <TableHead className="font-semibold text-foreground/70">First Name</TableHead>
+              <TableHead className="font-semibold text-foreground/70">Last Name</TableHead>
+              <TableHead className="font-semibold text-foreground/70">Email</TableHead>
+              <TableHead className="font-semibold text-foreground/70">Role</TableHead>
+              <TableHead className="font-semibold text-foreground/70">Organisation</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {paginated.map((s) => (
+              <TableRow key={s.id} className="hover:bg-muted/30 transition-colors">
+                <TableCell className="text-muted-foreground">{s.title ?? '-'}</TableCell>
+                <TableCell className="font-medium">{s.firstName}</TableCell>
+                <TableCell>{s.lastName}</TableCell>
+                <TableCell className="text-muted-foreground">{s.email}</TableCell>
+                <TableCell>{s.role}</TableCell>
+                <TableCell>{s.organisation}</TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
+
+      <div className="flex items-center justify-between px-1">
+        <div className="flex items-center gap-2">
+          <span className="text-sm text-muted-foreground">Rows per page:</span>
+          {PAGE_SIZE_OPTIONS.map((size) => (
+            <Button
+              key={size}
+              variant={pageSize === size ? 'default' : 'ghost'}
+              size="sm"
+              onClick={() => handlePageSizeChange(size)}
+              aria-pressed={pageSize === size}
+              className="h-8 w-8 p-0"
+            >
+              {size}
+            </Button>
+          ))}
+        </div>
+        <div className="flex items-center gap-3">
+          <span className="text-sm text-muted-foreground" aria-live="polite">
+            Page {currentPage} of {totalPages}
+          </span>
+          <div className="flex gap-1">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setCurrentPage((p) => p - 1)}
+              disabled={currentPage === 1}
+              aria-label="Previous page"
+              className="h-8 w-8 p-0"
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setCurrentPage((p) => p + 1)}
+              disabled={currentPage === totalPages}
+              aria-label="Next page"
+              className="h-8 w-8 p-0"
+            >
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }

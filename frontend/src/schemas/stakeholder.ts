@@ -8,6 +8,7 @@ export const stakeholderSchema = z.object({
   role: z.string(),
   organisation: z.string(),
   createdAt: z.string(),
+  title: z.string().optional(),
 });
 
 export const stakeholderArraySchema = z.array(stakeholderSchema);
