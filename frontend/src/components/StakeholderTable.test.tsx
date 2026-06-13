@@ -47,6 +47,8 @@ function renderTable(
     pageSize?: number;
     onPageChange?: (page: number) => void;
     onPageSizeChange?: (size: number) => void;
+    onDeleted?: () => void;
+    onEdited?: () => void;
   } = {}
 ) {
   render(
@@ -57,6 +59,8 @@ function renderTable(
       pageSize={overrides.pageSize ?? 10}
       onPageChange={overrides.onPageChange ?? vi.fn()}
       onPageSizeChange={overrides.onPageSizeChange ?? vi.fn()}
+      onDeleted={overrides.onDeleted ?? vi.fn()}
+      onEdited={overrides.onEdited ?? vi.fn()}
     />
   );
 }

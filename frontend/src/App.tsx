@@ -1,50 +1,56 @@
-import { BrowserRouter, Routes, Route, NavLink } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Outlet } from 'react-router-dom';
+import { DashboardPage } from './pages/DashboardPage';
 import { StakeholdersPage } from './pages/StakeholdersPage';
 import { CreateStakeholderPage } from './pages/CreateStakeholderPage';
-import { cn } from '@/lib/utils';
+import { LoginPage } from './pages/LoginPage';
+import { ProtectedRoute } from './components/ProtectedRoute';
+import { AppSidebar } from './components/AppSidebar';
+import { AuthProvider } from './context/AuthContext';
+import {
+  SidebarProvider,
+  SidebarInset,
+  SidebarTrigger,
+} from '@/components/ui/sidebar';
+
+function DashboardLayout() {
+  return (
+    <SidebarProvider>
+      <AppSidebar />
+      <SidebarInset>
+        <header className="flex h-12 items-center gap-2 px-4 border-b md:hidden">
+          <SidebarTrigger />
+          <span className="font-semibold text-sm">Stakeholder Manager</span>
+        </header>
+        <div className="p-6">
+          <Outlet />
+        </div>
+      </SidebarInset>
+    </SidebarProvider>
+  );
+}
+
+function AppRoutes() {
+  return (
+    <Routes>
+      <Route path="/login" element={<LoginPage />} />
+      <Route element={<ProtectedRoute />}>
+        <Route element={<DashboardLayout />}>
+          <Route path="/" element={<DashboardPage />} />
+          <Route path="/stakeholders" element={<StakeholdersPage />} />
+          <Route path="/stakeholders/new" element={<CreateStakeholderPage />} />
+        </Route>
+      </Route>
+    </Routes>
+  );
+}
 
 function App() {
   return (
-    <BrowserRouter>
-      <nav className="bg-primary text-primary-foreground h-[60px] flex items-center justify-between px-8 shadow-lg">
-        <span className="text-xl font-semibold tracking-tight">Stakeholder Manager</span>
-        <div className="flex gap-1">
-          <NavLink
-            to="/"
-            end
-            className={({ isActive }) =>
-              cn(
-                'px-4 py-2 rounded-md text-sm font-medium transition-all duration-200',
-                isActive
-                  ? 'bg-white/15 text-white'
-                  : 'text-white/70 hover:bg-white/10 hover:text-white'
-              )
-            }
-          >
-            Stakeholders
-          </NavLink>
-          <NavLink
-            to="/new"
-            className={({ isActive }) =>
-              cn(
-                'px-4 py-2 rounded-md text-sm font-medium transition-all duration-200',
-                isActive
-                  ? 'bg-white/15 text-white'
-                  : 'text-white/70 hover:bg-white/10 hover:text-white'
-              )
-            }
-          >
-            Add Stakeholder
-          </NavLink>
-        </div>
-      </nav>
-      <main className="max-w-7xl mx-auto px-8 py-8">
-        <Routes>
-          <Route path="/" element={<StakeholdersPage />} />
-          <Route path="/new" element={<CreateStakeholderPage />} />
-        </Routes>
-      </main>
-    </BrowserRouter>
+    <AuthProvider>
+      <BrowserRouter>
+        <AppRoutes />
+      </BrowserRouter>
+    </AuthProvider>
   );
 }
 

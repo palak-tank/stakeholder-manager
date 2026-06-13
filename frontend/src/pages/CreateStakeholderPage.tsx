@@ -1,10 +1,11 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { createStakeholder, CreateStakeholderInput } from '../services/stakeholderService';
+import { createStakeholder, type CreateStakeholderInput } from '../services/stakeholderService';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { PageLayout } from '@/components/PageLayout';
 
 const EMPTY_FORM: CreateStakeholderInput = {
   firstName: '',
@@ -38,7 +39,7 @@ export function CreateStakeholderPage() {
 
     try {
       await createStakeholder(input);
-      navigate('/');
+      navigate('/stakeholders');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to create stakeholder.');
     } finally {
@@ -47,10 +48,7 @@ export function CreateStakeholderPage() {
   }
 
   return (
-    <div>
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-3xl font-bold tracking-tight text-foreground">Add Stakeholder</h1>
-      </div>
+    <PageLayout title="Add Stakeholder">
       <Card className="max-w-2xl shadow-md">
         <CardHeader className="pb-2">
           <CardTitle className="text-base font-medium text-muted-foreground">
@@ -145,7 +143,7 @@ export function CreateStakeholderPage() {
               <Button
                 type="button"
                 variant="outline"
-                onClick={() => navigate('/')}
+                onClick={() => navigate('/stakeholders')}
               >
                 Cancel
               </Button>
@@ -156,6 +154,6 @@ export function CreateStakeholderPage() {
           </form>
         </CardContent>
       </Card>
-    </div>
+    </PageLayout>
   );
 }

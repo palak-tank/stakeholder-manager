@@ -1,10 +1,14 @@
 import { useEffect, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import { StakeholderTable } from '../components/StakeholderTable';
 import { getStakeholders } from '../services/stakeholderService';
-import { Stakeholder } from '../types/stakeholder';
+import type { Stakeholder } from '../types/stakeholder';
+import { PageLayout } from '@/components/PageLayout';
+import { Button } from '@/components/ui/button';
+import { PlusCircle } from 'lucide-react';
 
 export function StakeholdersPage() {
+  const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const currentPage = Number(searchParams.get('page') ?? '1');
   const pageSize = Number(searchParams.get('pageSize') ?? '10');
@@ -36,10 +40,16 @@ export function StakeholdersPage() {
   };
 
   return (
-    <div>
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-3xl font-bold tracking-tight text-foreground">Stakeholders</h1>
-      </div>
+    <PageLayout
+      title="Stakeholders"
+      subtitle="Manage your stakeholder relationships"
+      actions={
+        <Button onClick={() => navigate('/stakeholders/new')}>
+          <PlusCircle className="size-4" />
+          Add Stakeholder
+        </Button>
+      }
+    >
       {loading && (
         <p className="text-muted-foreground animate-pulse text-sm">Loading stakeholders…</p>
       )}
@@ -60,6 +70,6 @@ export function StakeholdersPage() {
           onEdited={() => setRefreshKey(k => k + 1)}
         />
       )}
-    </div>
+    </PageLayout>
   );
 }
