@@ -1,4 +1,7 @@
+import { useState } from 'react';
 import { Stakeholder } from '../types/stakeholder';
+import { deleteStakeholder } from '../services/stakeholderService';
+import { EditStakeholderDialog } from './EditStakeholderDialog';
 import {
   Table,
   TableBody,
@@ -8,7 +11,17 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
+import { ChevronLeft, ChevronRight, Pencil, Trash2 } from 'lucide-react';
 
 const PAGE_SIZE_OPTIONS = [5, 10, 25] as const;
 
@@ -19,6 +32,8 @@ interface Props {
   pageSize: number;
   onPageChange: (page: number) => void;
   onPageSizeChange: (size: number) => void;
+  onDeleted: () => void;
+  onEdited: () => void;
 }
 
 export function StakeholderTable({
@@ -28,7 +43,28 @@ export function StakeholderTable({
   pageSize,
   onPageChange,
   onPageSizeChange,
+  onDeleted,
+  onEdited,
 }: Props) {
+  const [editingStakeholder, setEditingStakeholder] = useState<Stakeholder | null>(null);
+  const [deletingStakeholder, setDeletingStakeholder] = useState<Stakeholder | null>(null);
+  const [deleting, setDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
+
+  async function handleConfirmDelete() {
+    if (!deletingStakeholder) return;
+    setDeleting(true);
+    setDeleteError(null);
+    try {
+      await deleteStakeholder(deletingStakeholder.id);
+      setDeletingStakeholder(null);
+      onDeleted();
+    } catch {
+      setDeleteError('Failed to delete stakeholder. Please try again.');
+      setDeleting(false);
+    }
+  }
+
   if (totalCount === 0) {
     return (
       <div className="rounded-lg border bg-card px-6 py-12 text-center text-muted-foreground shadow-sm">
@@ -41,6 +77,12 @@ export function StakeholderTable({
 
   return (
     <div className="space-y-4">
+      {deleteError && (
+        <div className="rounded-lg border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive">
+          {deleteError}
+        </div>
+      )}
+
       <div className="rounded-lg border bg-card shadow-sm overflow-hidden">
         <Table>
           <TableHeader>
@@ -51,6 +93,7 @@ export function StakeholderTable({
               <TableHead className="font-semibold text-foreground/70">Email</TableHead>
               <TableHead className="font-semibold text-foreground/70">Role</TableHead>
               <TableHead className="font-semibold text-foreground/70">Organisation</TableHead>
+              <TableHead className="font-semibold text-foreground/70 w-20 text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -62,6 +105,27 @@ export function StakeholderTable({
                 <TableCell className="text-muted-foreground">{s.email}</TableCell>
                 <TableCell>{s.role}</TableCell>
                 <TableCell>{s.organisation}</TableCell>
+                <TableCell className="text-right">
+                  <div className="flex justify-end gap-1">
+                    <Button
+                      variant="ghost"
+                      size="icon-sm"
+                      onClick={() => setEditingStakeholder(s)}
+                      aria-label={`Edit ${s.firstName} ${s.lastName}`}
+                    >
+                      <Pencil />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon-sm"
+                      onClick={() => { setDeleteError(null); setDeletingStakeholder(s); }}
+                      aria-label={`Delete ${s.firstName} ${s.lastName}`}
+                      className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                    >
+                      <Trash2 />
+                    </Button>
+                  </div>
+                </TableCell>
               </TableRow>
             ))}
           </TableBody>
@@ -112,6 +176,37 @@ export function StakeholderTable({
           </div>
         </div>
       </div>
+
+      <EditStakeholderDialog
+        stakeholder={editingStakeholder}
+        open={!!editingStakeholder}
+        onClose={() => setEditingStakeholder(null)}
+        onSaved={() => { setEditingStakeholder(null); onEdited(); }}
+      />
+
+      <AlertDialog
+        open={!!deletingStakeholder}
+        onOpenChange={(open) => { if (!open && !deleting) setDeletingStakeholder(null); }}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete stakeholder?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will permanently delete{' '}
+              <span className="font-medium text-foreground">
+                {deletingStakeholder?.firstName} {deletingStakeholder?.lastName}
+              </span>
+              . This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={deleting}>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleConfirmDelete} disabled={deleting}>
+              {deleting ? 'Deleting…' : 'Delete'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

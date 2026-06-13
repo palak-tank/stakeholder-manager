@@ -43,3 +43,41 @@ export async function createStakeholder(input: CreateStakeholderInput): Promise<
   const data = await response.json();
   return stakeholderSchema.parse(data);
 }
+
+export type UpdateStakeholderInput = {
+  firstName: string;
+  lastName: string;
+  email: string;
+  role: string;
+  organisation: string;
+  title?: string;
+};
+
+export async function updateStakeholder(id: number, input: UpdateStakeholderInput): Promise<Stakeholder> {
+  const response = await fetch(`${API_BASE_URL}/stakeholders/${id}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(input),
+  });
+
+  if (response.status === 409) {
+    const error = await response.json();
+    throw new Error(error.message ?? 'A stakeholder with that email already exists.');
+  }
+
+  if (!response.ok) {
+    throw new Error('Failed to update stakeholder');
+  }
+
+  return stakeholderSchema.parse(await response.json());
+}
+
+export async function deleteStakeholder(id: number): Promise<void> {
+  const response = await fetch(`${API_BASE_URL}/stakeholders/${id}`, {
+    method: 'DELETE',
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to delete stakeholder');
+  }
+}

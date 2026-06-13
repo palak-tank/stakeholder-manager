@@ -11,6 +11,7 @@ export function StakeholdersPage() {
 
   const [stakeholders, setStakeholders] = useState<Stakeholder[]>([]);
   const [totalCount, setTotalCount] = useState(0);
+  const [refreshKey, setRefreshKey] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -24,7 +25,7 @@ export function StakeholdersPage() {
       })
       .catch(() => setError('Failed to load stakeholders. Is the API running?'))
       .finally(() => setLoading(false));
-  }, [currentPage, pageSize]);
+  }, [currentPage, pageSize, refreshKey]);
 
   const handlePageChange = (page: number) => {
     setSearchParams({ page: String(page), pageSize: String(pageSize) });
@@ -55,6 +56,8 @@ export function StakeholdersPage() {
           pageSize={pageSize}
           onPageChange={handlePageChange}
           onPageSizeChange={handlePageSizeChange}
+          onDeleted={() => setRefreshKey(k => k + 1)}
+          onEdited={() => setRefreshKey(k => k + 1)}
         />
       )}
     </div>
