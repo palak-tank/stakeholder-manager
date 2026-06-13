@@ -24,6 +24,11 @@ public class StakeholderService : IStakeholderService
         return new PagedResult<Stakeholder>(items, total);
     }
 
+    public async Task<Stakeholder?> GetByIdAsync(int id)
+    {
+        return await _context.Stakeholders.FindAsync(id);
+    }
+
     public async Task<Stakeholder> CreateStakeholderAsync(Stakeholder stakeholder)
     {
         // Normalize email so "Alice@Example.com" and "alice@example.com" are treated as duplicates.
@@ -36,5 +41,38 @@ public class StakeholderService : IStakeholderService
         _context.Stakeholders.Add(stakeholder);
         await _context.SaveChangesAsync();
         return stakeholder;
+    }
+
+    public async Task<Stakeholder?> UpdateStakeholderAsync(int id, UpdateStakeholderRequest request)
+    {
+        var stakeholder = await _context.Stakeholders.FindAsync(id);
+        if (stakeholder is null) return null;
+
+        var normalizedEmail = request.Email.Trim().ToLowerInvariant();
+
+        var emailTaken = await _context.Stakeholders
+            .AnyAsync(x => x.Email == normalizedEmail && x.Id != id);
+        if (emailTaken)
+            throw new InvalidOperationException($"A stakeholder with email '{normalizedEmail}' already exists.");
+
+        stakeholder.FirstName = request.FirstName;
+        stakeholder.LastName = request.LastName;
+        stakeholder.Email = normalizedEmail;
+        stakeholder.Role = request.Role;
+        stakeholder.Organisation = request.Organisation;
+        stakeholder.Title = request.Title;
+
+        await _context.SaveChangesAsync();
+        return stakeholder;
+    }
+
+    public async Task<bool> DeleteStakeholderAsync(int id)
+    {
+        var stakeholder = await _context.Stakeholders.FindAsync(id);
+        if (stakeholder is null) return false;
+
+        _context.Stakeholders.Remove(stakeholder);
+        await _context.SaveChangesAsync();
+        return true;
     }
 }

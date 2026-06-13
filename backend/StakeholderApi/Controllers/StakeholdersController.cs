@@ -23,6 +23,14 @@ public class StakeholdersController : ControllerBase
         return Ok(await _stakeholderService.GetAllStakeholdersAsync(page, pageSize));
     }
 
+    [HttpGet("{id}")]
+    public async Task<ActionResult<Stakeholder>> GetById(int id)
+    {
+        var stakeholder = await _stakeholderService.GetByIdAsync(id);
+        if (stakeholder is null) return NotFound();
+        return Ok(stakeholder);
+    }
+
     [HttpPost]
     public async Task<ActionResult<Stakeholder>> Create(CreateStakeholderRequest request)
     {
@@ -45,5 +53,28 @@ public class StakeholdersController : ControllerBase
         {
             return Conflict(new { message = ex.Message });
         }
+    }
+
+    [HttpPut("{id}")]
+    public async Task<ActionResult<Stakeholder>> Update(int id, UpdateStakeholderRequest request)
+    {
+        try
+        {
+            var updated = await _stakeholderService.UpdateStakeholderAsync(id, request);
+            if (updated is null) return NotFound();
+            return Ok(updated);
+        }
+        catch (InvalidOperationException ex)
+        {
+            return Conflict(new { message = ex.Message });
+        }
+    }
+
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> Delete(int id)
+    {
+        var deleted = await _stakeholderService.DeleteStakeholderAsync(id);
+        if (!deleted) return NotFound();
+        return NoContent();
     }
 }

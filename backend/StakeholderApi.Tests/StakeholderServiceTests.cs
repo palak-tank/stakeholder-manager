@@ -154,4 +154,93 @@ public class StakeholderServiceTests
 
         Assert.Equal(1, await context.Stakeholders.CountAsync());
     }
+
+    [Fact]
+    public async Task GetByIdAsync_ReturnsStakeholder_WhenExists()
+    {
+        using var context = CreateInMemoryContext(nameof(GetByIdAsync_ReturnsStakeholder_WhenExists));
+        context.Stakeholders.Add(new Stakeholder { Id = 1, FirstName = "Alice", LastName = "Johnson", Email = "alice@example.com", Role = "Investor", Organisation = "VCP", CreatedAt = DateTime.UtcNow });
+        await context.SaveChangesAsync();
+
+        var result = await new StakeholderService(context).GetByIdAsync(1);
+
+        Assert.NotNull(result);
+        Assert.Equal("alice@example.com", result.Email);
+    }
+
+    [Fact]
+    public async Task GetByIdAsync_ReturnsNull_WhenNotFound()
+    {
+        using var context = CreateInMemoryContext(nameof(GetByIdAsync_ReturnsNull_WhenNotFound));
+
+        var result = await new StakeholderService(context).GetByIdAsync(99);
+
+        Assert.Null(result);
+    }
+
+    [Fact]
+    public async Task UpdateStakeholderAsync_UpdatesAndReturnsStakeholder()
+    {
+        using var context = CreateInMemoryContext(nameof(UpdateStakeholderAsync_UpdatesAndReturnsStakeholder));
+        context.Stakeholders.Add(new Stakeholder { Id = 1, FirstName = "Alice", LastName = "Johnson", Email = "alice@example.com", Role = "Investor", Organisation = "VCP", CreatedAt = DateTime.UtcNow });
+        await context.SaveChangesAsync();
+
+        var request = new UpdateStakeholderRequest("Alice", "Smith", "alice@example.com", "Advisor", "NewOrg", null);
+        var result = await new StakeholderService(context).UpdateStakeholderAsync(1, request);
+
+        Assert.NotNull(result);
+        Assert.Equal("Smith", result.LastName);
+        Assert.Equal("Advisor", result.Role);
+        Assert.Equal("NewOrg", result.Organisation);
+    }
+
+    [Fact]
+    public async Task UpdateStakeholderAsync_ReturnsNull_WhenNotFound()
+    {
+        using var context = CreateInMemoryContext(nameof(UpdateStakeholderAsync_ReturnsNull_WhenNotFound));
+
+        var request = new UpdateStakeholderRequest("Alice", "Johnson", "alice@example.com", "Investor", "VCP", null);
+        var result = await new StakeholderService(context).UpdateStakeholderAsync(99, request);
+
+        Assert.Null(result);
+    }
+
+    [Fact]
+    public async Task UpdateStakeholderAsync_DuplicateEmail_ThrowsInvalidOperationException()
+    {
+        using var context = CreateInMemoryContext(nameof(UpdateStakeholderAsync_DuplicateEmail_ThrowsInvalidOperationException));
+        context.Stakeholders.AddRange(
+            new Stakeholder { Id = 1, FirstName = "Alice", LastName = "Johnson", Email = "alice@example.com", Role = "Investor", Organisation = "VCP", CreatedAt = DateTime.UtcNow },
+            new Stakeholder { Id = 2, FirstName = "Bob", LastName = "Williams", Email = "bob@example.com", Role = "Advisor", Organisation = "TC", CreatedAt = DateTime.UtcNow }
+        );
+        await context.SaveChangesAsync();
+
+        var request = new UpdateStakeholderRequest("Alice", "Johnson", "bob@example.com", "Investor", "VCP", null);
+        await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            new StakeholderService(context).UpdateStakeholderAsync(1, request)
+        );
+    }
+
+    [Fact]
+    public async Task DeleteStakeholderAsync_ReturnsTrueAndDeletesStakeholder()
+    {
+        using var context = CreateInMemoryContext(nameof(DeleteStakeholderAsync_ReturnsTrueAndDeletesStakeholder));
+        context.Stakeholders.Add(new Stakeholder { Id = 1, FirstName = "Alice", LastName = "Johnson", Email = "alice@example.com", Role = "Investor", Organisation = "VCP", CreatedAt = DateTime.UtcNow });
+        await context.SaveChangesAsync();
+
+        var result = await new StakeholderService(context).DeleteStakeholderAsync(1);
+
+        Assert.True(result);
+        Assert.Equal(0, await context.Stakeholders.CountAsync());
+    }
+
+    [Fact]
+    public async Task DeleteStakeholderAsync_ReturnsFalse_WhenNotFound()
+    {
+        using var context = CreateInMemoryContext(nameof(DeleteStakeholderAsync_ReturnsFalse_WhenNotFound));
+
+        var result = await new StakeholderService(context).DeleteStakeholderAsync(99);
+
+        Assert.False(result);
+    }
 }
