@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { toast } from 'sonner';
 import type { ColumnDef } from '@tanstack/react-table';
 import { Stakeholder } from '../types/stakeholder';
 import { deleteStakeholder } from '../services/stakeholderService';
@@ -41,18 +42,17 @@ export function StakeholderTable({
   const [editingStakeholder, setEditingStakeholder] = useState<Stakeholder | null>(null);
   const [deletingStakeholder, setDeletingStakeholder] = useState<Stakeholder | null>(null);
   const [deleting, setDeleting] = useState(false);
-  const [deleteError, setDeleteError] = useState<string | null>(null);
 
   async function handleConfirmDelete() {
     if (!deletingStakeholder) return;
     setDeleting(true);
-    setDeleteError(null);
     try {
       await deleteStakeholder(deletingStakeholder.id);
+      toast.success('Stakeholder deleted.');
       setDeletingStakeholder(null);
       onDeleted();
     } catch {
-      setDeleteError('Failed to delete stakeholder. Please try again.');
+      toast.error('Failed to delete stakeholder. Please try again.');
       setDeleting(false);
     }
   }
@@ -99,7 +99,7 @@ export function StakeholderTable({
               <Button
                 variant="ghost"
                 size="icon-sm"
-                onClick={() => { setDeleteError(null); setDeletingStakeholder(s); }}
+                onClick={() => setDeletingStakeholder(s)}
                 aria-label={`Delete ${s.firstName} ${s.lastName}`}
                 className="text-destructive hover:text-destructive hover:bg-destructive/10"
               >
@@ -116,12 +116,6 @@ export function StakeholderTable({
 
   return (
     <div className="space-y-4">
-      {deleteError && (
-        <div className="rounded-lg border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive">
-          {deleteError}
-        </div>
-      )}
-
       <DataTable
         columns={columns}
         data={stakeholders}

@@ -1,16 +1,14 @@
-import { useEffect, useState } from 'react';
-import { Stakeholder } from '../types/stakeholder';
-import { updateStakeholder, UpdateStakeholderInput } from '../services/stakeholderService';
+import { toast } from 'sonner';
+import { Stakeholder } from '@/types/stakeholder';
+import { updateStakeholder, type UpdateStakeholderInput } from '@/services/stakeholderService';
+import { TITLE_OPTIONS, ROLE_OPTIONS, type StakeholderFormValues } from '@/schemas/stakeholder';
 import {
   Dialog,
   DialogContent,
   DialogHeader,
-  DialogFooter,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { StakeholderForm } from '@/components/forms/stakeholder';
 
 interface Props {
   stakeholder: Stakeholder | null;
@@ -19,55 +17,35 @@ interface Props {
   onSaved: () => void;
 }
 
+const PREDEFINED_ROLES = ROLE_OPTIONS.filter((r) => r !== 'Other');
+
+function toFormValues(stakeholder: Stakeholder): Partial<StakeholderFormValues> {
+  const storedTitle = stakeholder.title ?? '';
+  const isKnownTitle = (TITLE_OPTIONS as readonly string[]).includes(storedTitle);
+
+  const isKnownRole = (PREDEFINED_ROLES as readonly string[]).includes(stakeholder.role);
+  const roleValue = isKnownRole ? (stakeholder.role as StakeholderFormValues['role']) : 'Other';
+  const roleOther = isKnownRole ? '' : stakeholder.role;
+
+  return {
+    firstName: stakeholder.firstName,
+    lastName: stakeholder.lastName,
+    email: stakeholder.email,
+    role: roleValue,
+    roleOther,
+    organisation: stakeholder.organisation,
+    title: isKnownTitle ? (storedTitle as StakeholderFormValues['title']) : storedTitle ? 'Other' : '',
+    titleOther: isKnownTitle || !storedTitle ? '' : storedTitle,
+  };
+}
+
 export function EditStakeholderDialog({ stakeholder, open, onClose, onSaved }: Props) {
-  const [form, setForm] = useState<UpdateStakeholderInput>({
-    firstName: '',
-    lastName: '',
-    email: '',
-    role: '',
-    organisation: '',
-    title: '',
-  });
-  const [submitting, setSubmitting] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (stakeholder) {
-      setForm({
-        firstName: stakeholder.firstName,
-        lastName: stakeholder.lastName,
-        email: stakeholder.email,
-        role: stakeholder.role,
-        organisation: stakeholder.organisation,
-        title: stakeholder.title ?? '',
-      });
-      setError(null);
-    }
-  }, [stakeholder]);
-
-  function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const { name, value } = e.target;
-    setForm(prev => ({ ...prev, [name]: value }));
-  }
-
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
+  async function handleSubmit(input: UpdateStakeholderInput) {
     if (!stakeholder) return;
-    setSubmitting(true);
-    setError(null);
-
-    try {
-      await updateStakeholder(stakeholder.id, {
-        ...form,
-        title: form.title?.trim() || undefined,
-      });
-      onSaved();
-      onClose();
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to update stakeholder.');
-    } finally {
-      setSubmitting(false);
-    }
+    await updateStakeholder(stakeholder.id, input);
+    toast.success('Changes saved.');
+    onSaved();
+    onClose();
   }
 
   return (
@@ -76,94 +54,15 @@ export function EditStakeholderDialog({ stakeholder, open, onClose, onSaved }: P
         <DialogHeader>
           <DialogTitle>Edit Stakeholder</DialogTitle>
         </DialogHeader>
-
-        <form onSubmit={handleSubmit} className="space-y-4 pt-2">
-          {error && (
-            <div className="rounded-lg border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive">
-              {error}
-            </div>
-          )}
-
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-1.5">
-              <Label htmlFor="edit-firstName">First Name</Label>
-              <Input
-                id="edit-firstName"
-                name="firstName"
-                value={form.firstName}
-                onChange={handleChange}
-                required
-              />
-            </div>
-            <div className="space-y-1.5">
-              <Label htmlFor="edit-lastName">Last Name</Label>
-              <Input
-                id="edit-lastName"
-                name="lastName"
-                value={form.lastName}
-                onChange={handleChange}
-                required
-              />
-            </div>
-          </div>
-
-          <div className="space-y-1.5">
-            <Label htmlFor="edit-email">Email</Label>
-            <Input
-              id="edit-email"
-              name="email"
-              type="email"
-              value={form.email}
-              onChange={handleChange}
-              required
-            />
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-1.5">
-              <Label htmlFor="edit-role">Role</Label>
-              <Input
-                id="edit-role"
-                name="role"
-                value={form.role}
-                onChange={handleChange}
-                required
-              />
-            </div>
-            <div className="space-y-1.5">
-              <Label htmlFor="edit-organisation">Organisation</Label>
-              <Input
-                id="edit-organisation"
-                name="organisation"
-                value={form.organisation}
-                onChange={handleChange}
-                required
-              />
-            </div>
-          </div>
-
-          <div className="space-y-1.5">
-            <Label htmlFor="edit-title">
-              Title{' '}
-              <span className="text-muted-foreground font-normal text-xs">(optional)</span>
-            </Label>
-            <Input
-              id="edit-title"
-              name="title"
-              value={form.title}
-              onChange={handleChange}
-            />
-          </div>
-
-          <DialogFooter className="pt-2">
-            <Button type="button" variant="outline" onClick={onClose} disabled={submitting}>
-              Cancel
-            </Button>
-            <Button type="submit" disabled={submitting}>
-              {submitting ? 'Saving…' : 'Save changes'}
-            </Button>
-          </DialogFooter>
-        </form>
+        <div className="pt-2">
+          <StakeholderForm
+            key={stakeholder?.id}
+            submitLabel="Save changes"
+            defaultValues={stakeholder ? toFormValues(stakeholder) : undefined}
+            onSubmit={handleSubmit}
+            onCancel={onClose}
+          />
+        </div>
       </DialogContent>
     </Dialog>
   );

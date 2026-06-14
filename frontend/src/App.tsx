@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route, Outlet } from 'react-router-dom';
+import { Toaster } from 'sonner';
 import { DashboardPage } from './pages/DashboardPage';
 import { StakeholdersPage } from './pages/StakeholdersPage';
 import { CreateStakeholderPage } from './pages/CreateStakeholderPage';
@@ -49,6 +50,7 @@ function App() {
     <AuthProvider>
       <BrowserRouter>
         <AppRoutes />
+        <Toaster richColors position="top-center" />
       </BrowserRouter>
     </AuthProvider>
   );
