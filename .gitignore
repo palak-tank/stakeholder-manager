@@ -23,6 +23,10 @@ backend/**/*.db-wal
 # Local development settings (contain secrets — never commit)
 backend/**/appsettings.Development.json
 
+# Test coverage
+frontend/src/test/coverage/
+backend/StakeholderApi.Tests/coverage/
+
 # OS
 .DS_Store
 Thumbs.db
