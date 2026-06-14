@@ -28,7 +28,7 @@ public class AuthController : ControllerBase
         if (user is null) return Unauthorized(new { message = "Invalid email or password." });
 
         var token = _authService.GenerateJwt(user);
-        var expirationHours = int.Parse(_config["Jwt:ExpirationHours"] ?? "24");
+        var expirationHours = int.TryParse(_config["Jwt:ExpirationHours"], out var h) ? h : 24;
 
         Response.Cookies.Append("jwt", token, new CookieOptions
         {

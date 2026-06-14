@@ -64,7 +64,7 @@ public class StakeholdersController : ControllerBase
             _logger.LogInformation(
                 "Stakeholder created — {FullName} <{Email}> by {Actor}",
                 $"{created.FirstName} {created.LastName}", created.Email, Actor);
-            return CreatedAtAction(nameof(GetAll), new { id = created.Id }, created);
+            return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
         }
         catch (InvalidOperationException ex)
         {

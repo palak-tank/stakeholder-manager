@@ -21,7 +21,7 @@ public class AuthService : IAuthService
 
     public async Task<User?> ValidateUserAsync(string email, string password)
     {
-        var user = await _db.Users.SingleOrDefaultAsync(u => u.Email == email.Trim().ToLower());
+        var user = await _db.Users.SingleOrDefaultAsync(u => u.Email == email.Trim().ToLowerInvariant());
         if (user is null) return null;
         return BCrypt.Net.BCrypt.Verify(password, user.PasswordHash) ? user : null;
     }
@@ -32,7 +32,7 @@ public class AuthService : IAuthService
             ?? throw new InvalidOperationException("Jwt:Secret is not configured.");
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secret));
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-        var expiry = DateTime.UtcNow.AddHours(int.Parse(_config["Jwt:ExpirationHours"] ?? "24"));
+        var expiry = DateTime.UtcNow.AddHours(int.TryParse(_config["Jwt:ExpirationHours"], out var h) ? h : 24);
 
         var claims = new[]
         {

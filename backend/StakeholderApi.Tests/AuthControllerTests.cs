@@ -1,6 +1,8 @@
 using System.Security.Claims;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using Moq;
 using StakeholderApi.Controllers;
 using StakeholderApi.Models;
@@ -13,7 +15,16 @@ public class AuthControllerTests
 {
     private static AuthController CreateController(Mock<IAuthService> svcMock, ClaimsPrincipal? user = null)
     {
-        var controller = new AuthController(svcMock.Object);
+        var config = new ConfigurationBuilder()
+            .AddInMemoryCollection(new Dictionary<string, string?>
+            {
+                ["Jwt:ExpirationHours"] = "24",
+            })
+            .Build();
+        var env = new Mock<IWebHostEnvironment>();
+        env.Setup(e => e.EnvironmentName).Returns("Development");
+
+        var controller = new AuthController(svcMock.Object, config, env.Object);
         controller.ControllerContext = new ControllerContext
         {
             HttpContext = new DefaultHttpContext

@@ -107,12 +107,14 @@ using (var scope = app.Services.CreateScope())
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     db.Database.Migrate();
 
-    if (!db.Users.Any())
+    var seedEmail    = app.Configuration["Seed:AdminEmail"];
+    var seedPassword = app.Configuration["Seed:AdminPassword"];
+    if (!db.Users.Any() && !string.IsNullOrWhiteSpace(seedEmail) && !string.IsNullOrWhiteSpace(seedPassword))
     {
         db.Users.Add(new User
         {
-            Email = "palaktank1111@gmail.com",
-            PasswordHash = BCrypt.Net.BCrypt.HashPassword("Test@1234")
+            Email        = seedEmail.Trim().ToLowerInvariant(),
+            PasswordHash = BCrypt.Net.BCrypt.HashPassword(seedPassword)
         });
         db.SaveChanges();
     }
