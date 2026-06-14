@@ -243,4 +243,195 @@ public class StakeholderServiceTests
 
         Assert.False(result);
     }
+
+    // ── Email normalisation ──────────────────────────────────────────────────
+
+    [Fact]
+    public async Task CreateStakeholderAsync_NormalizesEmailToLowercase()
+    {
+        using var context = CreateInMemoryContext(nameof(CreateStakeholderAsync_NormalizesEmailToLowercase));
+        var service = new StakeholderService(context);
+
+        var result = await service.CreateStakeholderAsync(
+            new Stakeholder { FirstName = "Alice", LastName = "Johnson", Email = "ALICE@EXAMPLE.COM", Role = "Investor", Organisation = "VCP" }
+        );
+
+        Assert.Equal("alice@example.com", result.Email);
+    }
+
+    [Fact]
+    public async Task CreateStakeholderAsync_TrimsEmailWhitespace()
+    {
+        using var context = CreateInMemoryContext(nameof(CreateStakeholderAsync_TrimsEmailWhitespace));
+        var service = new StakeholderService(context);
+
+        var result = await service.CreateStakeholderAsync(
+            new Stakeholder { FirstName = "Alice", LastName = "Johnson", Email = "  alice@example.com  ", Role = "Investor", Organisation = "VCP" }
+        );
+
+        Assert.Equal("alice@example.com", result.Email);
+    }
+
+    [Fact]
+    public async Task CreateStakeholderAsync_DuplicateEmail_IsCaseInsensitive()
+    {
+        using var context = CreateInMemoryContext(nameof(CreateStakeholderAsync_DuplicateEmail_IsCaseInsensitive));
+        context.Stakeholders.Add(new Stakeholder { Id = 1, FirstName = "Alice", LastName = "Johnson", Email = "alice@example.com", Role = "Investor", Organisation = "VCP", CreatedAt = DateTime.UtcNow });
+        await context.SaveChangesAsync();
+
+        var service = new StakeholderService(context);
+
+        await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            service.CreateStakeholderAsync(
+                new Stakeholder { FirstName = "Other", LastName = "Person", Email = "ALICE@EXAMPLE.COM", Role = "Advisor", Organisation = "TC" }
+            )
+        );
+    }
+
+    // ── Update edge cases ────────────────────────────────────────────────────
+
+    [Fact]
+    public async Task UpdateStakeholderAsync_KeepingOwnEmail_Succeeds()
+    {
+        using var context = CreateInMemoryContext(nameof(UpdateStakeholderAsync_KeepingOwnEmail_Succeeds));
+        context.Stakeholders.Add(new Stakeholder { Id = 1, FirstName = "Alice", LastName = "Johnson", Email = "alice@example.com", Role = "Investor", Organisation = "VCP", CreatedAt = DateTime.UtcNow });
+        await context.SaveChangesAsync();
+
+        var request = new UpdateStakeholderRequest("Alice", "Johnson", "alice@example.com", "Advisor", "VCP", null);
+        var result = await new StakeholderService(context).UpdateStakeholderAsync(1, request);
+
+        Assert.NotNull(result);
+        Assert.Equal("Advisor", result.Role);
+    }
+
+    [Fact]
+    public async Task UpdateStakeholderAsync_NormalizesEmailToLowercase()
+    {
+        using var context = CreateInMemoryContext(nameof(UpdateStakeholderAsync_NormalizesEmailToLowercase));
+        context.Stakeholders.Add(new Stakeholder { Id = 1, FirstName = "Alice", LastName = "Johnson", Email = "alice@example.com", Role = "Investor", Organisation = "VCP", CreatedAt = DateTime.UtcNow });
+        await context.SaveChangesAsync();
+
+        var request = new UpdateStakeholderRequest("Alice", "Johnson", "ALICE@NEWDOMAIN.COM", "Investor", "VCP", null);
+        var result = await new StakeholderService(context).UpdateStakeholderAsync(1, request);
+
+        Assert.Equal("alice@newdomain.com", result!.Email);
+    }
+
+    [Fact]
+    public async Task UpdateStakeholderAsync_DuplicateEmail_IsCaseInsensitive()
+    {
+        using var context = CreateInMemoryContext(nameof(UpdateStakeholderAsync_DuplicateEmail_IsCaseInsensitive));
+        context.Stakeholders.AddRange(
+            new Stakeholder { Id = 1, FirstName = "Alice", LastName = "Johnson", Email = "alice@example.com", Role = "Investor", Organisation = "VCP", CreatedAt = DateTime.UtcNow },
+            new Stakeholder { Id = 2, FirstName = "Bob", LastName = "Williams", Email = "bob@example.com", Role = "Advisor", Organisation = "TC", CreatedAt = DateTime.UtcNow }
+        );
+        await context.SaveChangesAsync();
+
+        var request = new UpdateStakeholderRequest("Alice", "Johnson", "BOB@EXAMPLE.COM", "Investor", "VCP", null);
+        await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            new StakeholderService(context).UpdateStakeholderAsync(1, request)
+        );
+    }
+
+    [Fact]
+    public async Task UpdateStakeholderAsync_DoesNotChangeCreatedAt()
+    {
+        var originalCreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+        using var context = CreateInMemoryContext(nameof(UpdateStakeholderAsync_DoesNotChangeCreatedAt));
+        context.Stakeholders.Add(new Stakeholder { Id = 1, FirstName = "Alice", LastName = "Johnson", Email = "alice@example.com", Role = "Investor", Organisation = "VCP", CreatedAt = originalCreatedAt });
+        await context.SaveChangesAsync();
+
+        var request = new UpdateStakeholderRequest("Alice", "Smith", "alice@example.com", "Advisor", "NewOrg", null);
+        var result = await new StakeholderService(context).UpdateStakeholderAsync(1, request);
+
+        Assert.Equal(originalCreatedAt, result!.CreatedAt);
+    }
+
+    // ── Pagination ───────────────────────────────────────────────────────────
+
+    [Fact]
+    public async Task GetAllStakeholdersAsync_Pagination_ReturnsCorrectPage()
+    {
+        using var context = CreateInMemoryContext(nameof(GetAllStakeholdersAsync_Pagination_ReturnsCorrectPage));
+        context.Stakeholders.AddRange(
+            new Stakeholder { FirstName = "A", LastName = "Apple",  Email = "a@a.com", Role = "Investor", Organisation = "X", CreatedAt = DateTime.UtcNow },
+            new Stakeholder { FirstName = "B", LastName = "Banana", Email = "b@b.com", Role = "Advisor",  Organisation = "X", CreatedAt = DateTime.UtcNow },
+            new Stakeholder { FirstName = "C", LastName = "Cherry", Email = "c@c.com", Role = "Partner",  Organisation = "X", CreatedAt = DateTime.UtcNow },
+            new Stakeholder { FirstName = "D", LastName = "Date",   Email = "d@d.com", Role = "Mentor",   Organisation = "X", CreatedAt = DateTime.UtcNow }
+        );
+        await context.SaveChangesAsync();
+
+        // page=1, pageSize=2 → skip 2 → Cherry, Date (sorted by LastName)
+        var result = await new StakeholderService(context).GetAllStakeholdersAsync(page: 1, pageSize: 2);
+
+        Assert.Equal(2, result.Items.Count());
+        Assert.Equal("Cherry", result.Items.First().LastName);
+        Assert.Equal("Date", result.Items.Last().LastName);
+    }
+
+    [Fact]
+    public async Task GetAllStakeholdersAsync_Pagination_TotalCountReflectsAllRecords()
+    {
+        using var context = CreateInMemoryContext(nameof(GetAllStakeholdersAsync_Pagination_TotalCountReflectsAllRecords));
+        context.Stakeholders.AddRange(
+            new Stakeholder { FirstName = "A", LastName = "Apple",  Email = "a@a.com", Role = "Investor", Organisation = "X", CreatedAt = DateTime.UtcNow },
+            new Stakeholder { FirstName = "B", LastName = "Banana", Email = "b@b.com", Role = "Advisor",  Organisation = "X", CreatedAt = DateTime.UtcNow },
+            new Stakeholder { FirstName = "C", LastName = "Cherry", Email = "c@c.com", Role = "Partner",  Organisation = "X", CreatedAt = DateTime.UtcNow }
+        );
+        await context.SaveChangesAsync();
+
+        var result = await new StakeholderService(context).GetAllStakeholdersAsync(page: 1, pageSize: 2);
+
+        Assert.Equal(3, result.TotalCount); // all records, not just this page
+        Assert.Single(result.Items);        // only the 1 remaining item on page 1
+    }
+
+    [Fact]
+    public async Task GetAllStakeholdersAsync_PageBeyondEnd_ReturnsEmptyItems()
+    {
+        using var context = CreateInMemoryContext(nameof(GetAllStakeholdersAsync_PageBeyondEnd_ReturnsEmptyItems));
+        context.Stakeholders.Add(new Stakeholder { FirstName = "Alice", LastName = "Johnson", Email = "a@a.com", Role = "Investor", Organisation = "X", CreatedAt = DateTime.UtcNow });
+        await context.SaveChangesAsync();
+
+        var result = await new StakeholderService(context).GetAllStakeholdersAsync(page: 5, pageSize: 10);
+
+        Assert.Empty(result.Items);
+        Assert.Equal(1, result.TotalCount);
+    }
+
+    // ── EmailExistsAsync ─────────────────────────────────────────────────────
+
+    [Fact]
+    public async Task EmailExistsAsync_ReturnsTrue_WhenEmailExists()
+    {
+        using var context = CreateInMemoryContext(nameof(EmailExistsAsync_ReturnsTrue_WhenEmailExists));
+        context.Stakeholders.Add(new Stakeholder { FirstName = "Alice", LastName = "Johnson", Email = "alice@example.com", Role = "Investor", Organisation = "VCP", CreatedAt = DateTime.UtcNow });
+        await context.SaveChangesAsync();
+
+        var result = await new StakeholderService(context).EmailExistsAsync("alice@example.com");
+
+        Assert.True(result);
+    }
+
+    [Fact]
+    public async Task EmailExistsAsync_ReturnsFalse_WhenEmailNotFound()
+    {
+        using var context = CreateInMemoryContext(nameof(EmailExistsAsync_ReturnsFalse_WhenEmailNotFound));
+
+        var result = await new StakeholderService(context).EmailExistsAsync("nobody@example.com");
+
+        Assert.False(result);
+    }
+
+    [Fact]
+    public async Task EmailExistsAsync_IsCaseInsensitive()
+    {
+        using var context = CreateInMemoryContext(nameof(EmailExistsAsync_IsCaseInsensitive));
+        context.Stakeholders.Add(new Stakeholder { FirstName = "Alice", LastName = "Johnson", Email = "alice@example.com", Role = "Investor", Organisation = "VCP", CreatedAt = DateTime.UtcNow });
+        await context.SaveChangesAsync();
+
+        var result = await new StakeholderService(context).EmailExistsAsync("ALICE@EXAMPLE.COM");
+
+        Assert.True(result);
+    }
 }
