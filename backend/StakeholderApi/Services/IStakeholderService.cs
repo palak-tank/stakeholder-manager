@@ -9,4 +9,5 @@ public interface IStakeholderService
     Task<Stakeholder> CreateStakeholderAsync(Stakeholder stakeholder);
     Task<Stakeholder?> UpdateStakeholderAsync(int id, UpdateStakeholderRequest request);
     Task<bool> DeleteStakeholderAsync(int id);
+    Task<bool> EmailExistsAsync(string email);
 }

@@ -75,4 +75,10 @@ public class StakeholderService : IStakeholderService
         await _context.SaveChangesAsync();
         return true;
     }
+
+    public async Task<bool> EmailExistsAsync(string email)
+    {
+        var normalized = email.Trim().ToLowerInvariant();
+        return await _context.Stakeholders.AnyAsync(x => x.Email == normalized);
+    }
 }

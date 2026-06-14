@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using StakeholderApi.Models;
@@ -11,11 +12,20 @@ namespace StakeholderApi.Controllers;
 public class StakeholdersController : ControllerBase
 {
     private readonly IStakeholderService _stakeholderService;
+    private readonly ILogger<StakeholdersController> _logger;
 
-    public StakeholdersController(IStakeholderService stakeholderService)
+    public StakeholdersController(IStakeholderService stakeholderService, ILogger<StakeholdersController> logger)
     {
         _stakeholderService = stakeholderService;
+        _logger = logger;
     }
+
+    // "email" stays as-is when DefaultInboundClaimTypeMap is cleared;
+    // ClaimTypes.Email is the fallback for when the middleware remaps it to the long URI form.
+    private string Actor =>
+        User.FindFirst("email")?.Value ??
+        User.FindFirst(ClaimTypes.Email)?.Value ??
+        "unknown";
 
     [HttpGet]
     public async Task<ActionResult<PagedResult<Stakeholder>>> GetAll(
@@ -49,10 +59,16 @@ public class StakeholdersController : ControllerBase
         try
         {
             var created = await _stakeholderService.CreateStakeholderAsync(stakeholder);
+            _logger.LogInformation(
+                "Stakeholder created — {FullName} <{Email}> by {Actor}",
+                $"{created.FirstName} {created.LastName}", created.Email, Actor);
             return CreatedAtAction(nameof(GetAll), new { id = created.Id }, created);
         }
         catch (InvalidOperationException ex)
         {
+            _logger.LogWarning(
+                "Create rejected — {Email} already exists (by {Actor})",
+                request.Email, Actor);
             return Conflict(new { message = ex.Message });
         }
     }
@@ -63,11 +79,23 @@ public class StakeholdersController : ControllerBase
         try
         {
             var updated = await _stakeholderService.UpdateStakeholderAsync(id, request);
-            if (updated is null) return NotFound();
+            if (updated is null)
+            {
+                _logger.LogWarning(
+                    "Update failed — stakeholder #{Id} not found (by {Actor})",
+                    id, Actor);
+                return NotFound();
+            }
+            _logger.LogInformation(
+                "Stakeholder #{Id} updated — {FullName} <{Email}> by {Actor}",
+                id, $"{updated.FirstName} {updated.LastName}", updated.Email, Actor);
             return Ok(updated);
         }
         catch (InvalidOperationException ex)
         {
+            _logger.LogWarning(
+                "Update rejected — email {Email} already taken (stakeholder #{Id}, by {Actor})",
+                request.Email, id, Actor);
             return Conflict(new { message = ex.Message });
         }
     }
@@ -76,7 +104,14 @@ public class StakeholdersController : ControllerBase
     public async Task<IActionResult> Delete(int id)
     {
         var deleted = await _stakeholderService.DeleteStakeholderAsync(id);
-        if (!deleted) return NotFound();
+        if (!deleted)
+        {
+            _logger.LogWarning(
+                "Delete failed — stakeholder #{Id} not found (by {Actor})",
+                id, Actor);
+            return NotFound();
+        }
+        _logger.LogInformation("Stakeholder #{Id} deleted by {Actor}", id, Actor);
         return NoContent();
     }
 }

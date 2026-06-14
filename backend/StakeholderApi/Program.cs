@@ -3,14 +3,48 @@ using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Serilog;
+using Serilog.Events;
 using StakeholderApi.Data;
+using StakeholderApi.Logging;
 using StakeholderApi.Models;
 using StakeholderApi.Services;
 
 // Keep JWT claim names as-is (don't remap "email" → long URI)
 JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
 
+// Bootstrap logger for startup errors before full config is loaded
+Log.Logger = new LoggerConfiguration()
+    .WriteTo.Console()
+    .CreateBootstrapLogger();
+
 var builder = WebApplication.CreateBuilder(args);
+
+// Serilog — two-phase init so we can read the webhook URL from IConfiguration
+builder.Host.UseSerilog((ctx, _, config) =>
+{
+    config
+        .MinimumLevel.Information()
+        .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
+        .MinimumLevel.Override("System", LogEventLevel.Warning)
+        .Enrich.FromLogContext()
+        .WriteTo.Console(
+            outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] {SourceContext}: {Message:lj}{NewLine}{Exception}");
+
+    var webhookUrl = ctx.Configuration["Discord:WebhookUrl"];
+    if (!string.IsNullOrWhiteSpace(webhookUrl))
+    {
+        // Send to Discord:
+        //   • Error / Fatal from anywhere (unhandled exceptions, startup failures, etc.)
+        //   • Info / Warning from the stakeholders controller (audit trail)
+        config.WriteTo.Logger(sub => sub
+            .Filter.ByIncludingOnly(e =>
+                e.Level >= LogEventLevel.Error ||
+                (e.Properties.TryGetValue("SourceContext", out var sc) &&
+                 sc.ToString().Contains("StakeholdersController")))
+            .WriteTo.Discord(webhookUrl));
+    }
+});
 
 // API layer
 builder.Services.AddControllers();
