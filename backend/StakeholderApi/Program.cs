@@ -58,6 +58,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 // Application services
 builder.Services.AddScoped<IStakeholderService, StakeholderService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IDashboardService, DashboardService>();
 
 // JWT authentication — token is read from the httpOnly "jwt" cookie
 var jwtSecret = builder.Configuration["Jwt:Secret"]!;
@@ -120,6 +121,13 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseExceptionHandler(err => err.Run(async ctx =>
+{
+    ctx.Response.StatusCode = 500;
+    ctx.Response.ContentType = "application/json";
+    await ctx.Response.WriteAsJsonAsync(new { message = "Something went wrong on our end. Please try again later." });
+}));
 
 app.UseCors();
 app.UseAuthentication();
