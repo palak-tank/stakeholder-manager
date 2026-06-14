@@ -20,6 +20,9 @@ backend/**/*.db-wal
 .env
 .env.local
 
+# Local development settings (contain secrets — never commit)
+backend/**/appsettings.Development.json
+
 # OS
 .DS_Store
 Thumbs.db
