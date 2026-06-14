@@ -28,10 +28,11 @@ public class AuthService : IAuthService
 
     public string GenerateJwt(User user)
     {
-        var secret = _config["Jwt:Secret"]!;
+        var secret = _config["Jwt:Secret"]
+            ?? throw new InvalidOperationException("Jwt:Secret is not configured.");
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secret));
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-        var expiry = DateTime.UtcNow.AddHours(int.Parse(_config["Jwt:ExpirationHours"]!));
+        var expiry = DateTime.UtcNow.AddHours(int.Parse(_config["Jwt:ExpirationHours"] ?? "24"));
 
         var claims = new[]
         {

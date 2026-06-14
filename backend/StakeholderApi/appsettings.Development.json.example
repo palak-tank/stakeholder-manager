@@ -1,0 +1,11 @@
+{
+  "Jwt": {
+    "Secret": "REPLACE-WITH-A-RANDOM-SECRET-AT-LEAST-32-CHARACTERS-LONG",
+    "Issuer": "StakeholderApi",
+    "Audience": "StakeholderApp",
+    "ExpirationHours": 24
+  },
+  "Discord": {
+    "WebhookUrl": ""
+  }
+}
