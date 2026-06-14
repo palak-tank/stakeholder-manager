@@ -1,5 +1,6 @@
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { ApiError } from '@/services/apiError';
 import {
   stakeholderFormSchema,
   StakeholderFormValues,
@@ -70,7 +71,11 @@ export function StakeholderForm({
     } catch (err) {
       const message =
         err instanceof Error ? err.message : 'Something went wrong. Please try again.';
-      setError('email', { type: 'manual', message });
+      if (err instanceof ApiError && err.status === 409) {
+        setError('email', { type: 'manual', message });
+      } else {
+        setError('root', { type: 'manual', message });
+      }
     }
   }
 

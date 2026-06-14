@@ -50,6 +50,7 @@ export function StakeholderTable({
       await deleteStakeholder(deletingStakeholder.id);
       toast.success('Stakeholder deleted.');
       setDeletingStakeholder(null);
+      setDeleting(false);
       onDeleted();
     } catch {
       toast.error('Failed to delete stakeholder. Please try again.');

@@ -48,6 +48,9 @@ public class StakeholderService : IStakeholderService
         var stakeholder = await _context.Stakeholders.FindAsync(id);
         if (stakeholder is null) return null;
 
+        if (string.IsNullOrWhiteSpace(request.Email))
+            throw new InvalidOperationException("Email is required.");
+
         var normalizedEmail = request.Email.Trim().ToLowerInvariant();
 
         var emailTaken = await _context.Stakeholders

@@ -32,6 +32,8 @@ public class StakeholdersController : ControllerBase
         [FromQuery] int page = 0,
         [FromQuery] int pageSize = 10)
     {
+        pageSize = Math.Clamp(pageSize, 1, 100);
+        page = Math.Max(page, 0);
         return Ok(await _stakeholderService.GetAllStakeholdersAsync(page, pageSize));
     }
 

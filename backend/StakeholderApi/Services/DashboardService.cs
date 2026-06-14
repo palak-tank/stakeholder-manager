@@ -20,6 +20,7 @@ public class DashboardService : IDashboardService
         var totalStakeholders = all.Count;
 
         var totalOrganisations = all
+            .Where(s => !string.IsNullOrWhiteSpace(s.Organisation))
             .Select(s => s.Organisation.ToLowerInvariant())
             .Distinct()
             .Count();
@@ -31,6 +32,7 @@ public class DashboardService : IDashboardService
             .ToList();
 
         var topOrganisations = all
+            .Where(s => !string.IsNullOrWhiteSpace(s.Organisation))
             .GroupBy(s => s.Organisation)
             .Select(g => new OrgCount(g.Key, g.Count()))
             .OrderByDescending(o => o.Count)

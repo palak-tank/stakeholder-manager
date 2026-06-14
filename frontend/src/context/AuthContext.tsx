@@ -18,7 +18,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     authService.getMe()
       .then(setUser)
-      .catch(() => setUser(null))
+      .catch((err) => {
+        // Only clear auth state on a definitive 401; leave it unchanged on network errors
+        // so a transient failure doesn't log out a valid session.
+        if (err instanceof authService.ApiError && err.status === 401) setUser(null);
+      })
       .finally(() => setIsLoading(false));
   }, []);
 

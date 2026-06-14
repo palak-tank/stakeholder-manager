@@ -1,5 +1,8 @@
 import { loginResponseSchema, meResponseSchema } from '../schemas/auth';
+import { ApiError } from './apiError';
 import { AuthUser } from '../types/auth';
+
+export { ApiError };
 
 const AUTH_BASE = '/api/auth';
 
@@ -35,7 +38,7 @@ export async function getMe(): Promise<AuthUser> {
   });
 
   if (!response.ok) {
-    throw new Error('Not authenticated');
+    throw new ApiError(response.status, 'Not authenticated');
   }
 
   const data = await response.json();
