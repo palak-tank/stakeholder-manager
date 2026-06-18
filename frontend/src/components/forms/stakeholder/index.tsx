@@ -87,10 +87,10 @@ export function StakeholderForm({
         </div>
       )}
 
-      {/* Title — full width; expands to 50/50 grid when Other is selected */}
+      {/* Title — expands to 50/50 grid when Other is selected */}
       <div className={titleValue === 'Other' ? 'grid grid-cols-2 gap-5' : ''}>
         <div className="space-y-1.5">
-          <Label htmlFor="title">Title</Label>
+          <Label htmlFor="title">Title <span className="text-muted-foreground font-normal">(optional)</span></Label>
           <Select
             value={titleValue ?? ''}
             onValueChange={(val) =>
@@ -118,7 +118,7 @@ export function StakeholderForm({
 
         {titleValue === 'Other' && (
           <div className="space-y-1.5">
-            <Label htmlFor="titleOther">Custom Title</Label>
+            <Label htmlFor="titleOther">Custom Title <span className="text-muted-foreground font-normal">(optional)</span></Label>
             <Input
               id="titleOther"
               type="text"

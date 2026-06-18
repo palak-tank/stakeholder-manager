@@ -91,20 +91,6 @@ export const stakeholderFormSchema = z
         message: 'Please enter your custom role',
       });
     }
-    if (!data.title) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ['title'],
-        message: 'Title is required',
-      });
-    }
-    if (data.title === 'Other' && !data.titleOther) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ['titleOther'],
-        message: 'Please enter your custom title',
-      });
-    }
   });
   
 export type StakeholderFormValues = z.infer<typeof stakeholderFormSchema>;

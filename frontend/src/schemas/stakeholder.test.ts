@@ -149,34 +149,18 @@ describe('stakeholderFormSchema', () => {
   });
 
   // title superRefine
-  it('fails with "Title is required" when title is empty string', () => {
+  it('passes when title is empty string (title is optional)', () => {
     const result = stakeholderFormSchema.safeParse({ ...validPayload, title: '' });
-    expect(result.success).toBe(false);
-    if (!result.success) {
-      const msgs = result.error.flatten().fieldErrors.title;
-      expect(msgs?.some(m => m === 'Title is required')).toBe(true);
-    }
+    expect(result.success).toBe(true);
   });
 
-  it('fails with "Please enter your custom title" when title is Other but titleOther is missing', () => {
-    const result = stakeholderFormSchema.safeParse({
-      ...validPayload,
-      title: 'Other',
-      titleOther: '',
-    });
-    expect(result.success).toBe(false);
-    if (!result.success) {
-      const msgs = result.error.flatten().fieldErrors.titleOther;
-      expect(msgs?.some(m => m === 'Please enter your custom title')).toBe(true);
-    }
+  it('passes when title is Other and titleOther is empty', () => {
+    const result = stakeholderFormSchema.safeParse({ ...validPayload, title: 'Other', titleOther: '' });
+    expect(result.success).toBe(true);
   });
 
-  it('passes when title is Other and titleOther is provided', () => {
-    const result = stakeholderFormSchema.safeParse({
-      ...validPayload,
-      title: 'Other',
-      titleOther: 'Dr.',
-    });
+  it('passes when title is Other and titleOther has a value', () => {
+    const result = stakeholderFormSchema.safeParse({ ...validPayload, title: 'Other', titleOther: 'Dr.' });
     expect(result.success).toBe(true);
   });
 });
