@@ -48,13 +48,14 @@ public class StakeholderServiceTests
     }
 
     [Fact]
-    public async Task GetAllStakeholdersAsync_ReturnsStakeholdersOrderedByLastName()
+    public async Task GetAllStakeholdersAsync_ReturnsStakeholdersOrderedByUpdatedAtDescending()
     {
-        using var context = CreateInMemoryContext(nameof(GetAllStakeholdersAsync_ReturnsStakeholdersOrderedByLastName));
+        using var context = CreateInMemoryContext(nameof(GetAllStakeholdersAsync_ReturnsStakeholdersOrderedByUpdatedAtDescending));
+        var now = DateTime.UtcNow;
         context.Stakeholders.AddRange(
-            new Stakeholder { Id = 1, FirstName = "Carol", LastName = "Smith", Email = "carol@example.com", Role = "Partner", Organisation = "IH", CreatedAt = DateTime.UtcNow },
-            new Stakeholder { Id = 2, FirstName = "Alice", LastName = "Johnson", Email = "alice@example.com", Role = "Investor", Organisation = "VCP", CreatedAt = DateTime.UtcNow },
-            new Stakeholder { Id = 3, FirstName = "Bob", LastName = "Adams", Email = "bob@example.com", Role = "Advisor", Organisation = "TC", CreatedAt = DateTime.UtcNow }
+            new Stakeholder { Id = 1, FirstName = "Carol", LastName = "Smith",   Email = "carol@example.com", Role = "Partner",  Organisation = "IH",  CreatedAt = now.AddDays(-2), UpdatedAt = now.AddDays(-2) },
+            new Stakeholder { Id = 2, FirstName = "Alice", LastName = "Johnson", Email = "alice@example.com", Role = "Investor", Organisation = "VCP", CreatedAt = now.AddDays(-1), UpdatedAt = now.AddDays(-1) },
+            new Stakeholder { Id = 3, FirstName = "Bob",   LastName = "Adams",   Email = "bob@example.com",   Role = "Advisor",  Organisation = "TC",  CreatedAt = now,             UpdatedAt = now             }
         );
         await context.SaveChangesAsync();
 
@@ -62,9 +63,9 @@ public class StakeholderServiceTests
 
         var result = (await service.GetAllStakeholdersAsync(0, 10)).Items.ToList();
 
-        Assert.Equal("Adams", result[0].LastName);
+        Assert.Equal("Adams",   result[0].LastName);
         Assert.Equal("Johnson", result[1].LastName);
-        Assert.Equal("Smith", result[2].LastName);
+        Assert.Equal("Smith",   result[2].LastName);
     }
 
     [Fact]
