@@ -12,6 +12,7 @@ export const stakeholderSchema = z.object({
   role: z.string(),
   organisation: z.string(),
   createdAt: z.string(),
+  updatedAt: z.string(),
   title: z.string().nullable().optional().transform(v => v ?? undefined),
 });
 

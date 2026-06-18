@@ -26,6 +26,9 @@ namespace StakeholderApi.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("TEXT");
 
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("Email")
                         .IsRequired()
                         .HasColumnType("TEXT");
@@ -61,6 +64,7 @@ namespace StakeholderApi.Migrations
                         {
                             Id = 1,
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            UpdatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Email = "alice.johnson@example.com",
                             FirstName = "Alice",
                             LastName = "Johnson",
@@ -72,6 +76,7 @@ namespace StakeholderApi.Migrations
                         {
                             Id = 2,
                             CreatedAt = new DateTime(2024, 1, 8, 0, 0, 0, 0, DateTimeKind.Utc),
+                            UpdatedAt = new DateTime(2024, 1, 8, 0, 0, 0, 0, DateTimeKind.Utc),
                             Email = "bob.johnson@example.com",
                             FirstName = "Bob",
                             LastName = "Johnson",
@@ -83,6 +88,7 @@ namespace StakeholderApi.Migrations
                         {
                             Id = 3,
                             CreatedAt = new DateTime(2024, 1, 15, 0, 0, 0, 0, DateTimeKind.Utc),
+                            UpdatedAt = new DateTime(2024, 1, 15, 0, 0, 0, 0, DateTimeKind.Utc),
                             Email = "carol.johnson@example.com",
                             FirstName = "Carol",
                             LastName = "Johnson",
@@ -94,6 +100,7 @@ namespace StakeholderApi.Migrations
                         {
                             Id = 4,
                             CreatedAt = new DateTime(2024, 1, 22, 0, 0, 0, 0, DateTimeKind.Utc),
+                            UpdatedAt = new DateTime(2024, 1, 22, 0, 0, 0, 0, DateTimeKind.Utc),
                             Email = "david.johnson@example.com",
                             FirstName = "David",
                             LastName = "Johnson",
@@ -105,6 +112,7 @@ namespace StakeholderApi.Migrations
                         {
                             Id = 5,
                             CreatedAt = new DateTime(2024, 1, 29, 0, 0, 0, 0, DateTimeKind.Utc),
+                            UpdatedAt = new DateTime(2024, 1, 29, 0, 0, 0, 0, DateTimeKind.Utc),
                             Email = "eva.johnson@example.com",
                             FirstName = "Eva",
                             LastName = "Johnson",
@@ -116,6 +124,7 @@ namespace StakeholderApi.Migrations
                         {
                             Id = 6,
                             CreatedAt = new DateTime(2024, 2, 5, 0, 0, 0, 0, DateTimeKind.Utc),
+                            UpdatedAt = new DateTime(2024, 2, 5, 0, 0, 0, 0, DateTimeKind.Utc),
                             Email = "frank.johnson@example.com",
                             FirstName = "Frank",
                             LastName = "Johnson",
@@ -127,6 +136,7 @@ namespace StakeholderApi.Migrations
                         {
                             Id = 7,
                             CreatedAt = new DateTime(2024, 2, 12, 0, 0, 0, 0, DateTimeKind.Utc),
+                            UpdatedAt = new DateTime(2024, 2, 12, 0, 0, 0, 0, DateTimeKind.Utc),
                             Email = "grace.johnson@example.com",
                             FirstName = "Grace",
                             LastName = "Johnson",
@@ -138,6 +148,7 @@ namespace StakeholderApi.Migrations
                         {
                             Id = 8,
                             CreatedAt = new DateTime(2024, 2, 19, 0, 0, 0, 0, DateTimeKind.Utc),
+                            UpdatedAt = new DateTime(2024, 2, 19, 0, 0, 0, 0, DateTimeKind.Utc),
                             Email = "henry.johnson@example.com",
                             FirstName = "Henry",
                             LastName = "Johnson",
@@ -149,6 +160,7 @@ namespace StakeholderApi.Migrations
                         {
                             Id = 9,
                             CreatedAt = new DateTime(2024, 2, 26, 0, 0, 0, 0, DateTimeKind.Utc),
+                            UpdatedAt = new DateTime(2024, 2, 26, 0, 0, 0, 0, DateTimeKind.Utc),
                             Email = "isla.johnson@example.com",
                             FirstName = "Isla",
                             LastName = "Johnson",
@@ -160,6 +172,7 @@ namespace StakeholderApi.Migrations
                         {
                             Id = 10,
                             CreatedAt = new DateTime(2024, 3, 4, 0, 0, 0, 0, DateTimeKind.Utc),
+                            UpdatedAt = new DateTime(2024, 3, 4, 0, 0, 0, 0, DateTimeKind.Utc),
                             Email = "james.johnson@example.com",
                             FirstName = "James",
                             LastName = "Johnson",
@@ -171,6 +184,7 @@ namespace StakeholderApi.Migrations
                         {
                             Id = 11,
                             CreatedAt = new DateTime(2024, 3, 11, 0, 0, 0, 0, DateTimeKind.Utc),
+                            UpdatedAt = new DateTime(2024, 3, 11, 0, 0, 0, 0, DateTimeKind.Utc),
                             Email = "alice.williams@example.com",
                             FirstName = "Alice",
                             LastName = "Williams",
@@ -182,6 +196,7 @@ namespace StakeholderApi.Migrations
                         {
                             Id = 12,
                             CreatedAt = new DateTime(2024, 3, 18, 0, 0, 0, 0, DateTimeKind.Utc),
+                            UpdatedAt = new DateTime(2024, 3, 18, 0, 0, 0, 0, DateTimeKind.Utc),
                             Email = "bob.williams@example.com",
                             FirstName = "Bob",
                             LastName = "Williams",
@@ -193,6 +208,7 @@ namespace StakeholderApi.Migrations
                         {
                             Id = 13,
                             CreatedAt = new DateTime(2024, 3, 25, 0, 0, 0, 0, DateTimeKind.Utc),
+                            UpdatedAt = new DateTime(2024, 3, 25, 0, 0, 0, 0, DateTimeKind.Utc),
                             Email = "carol.williams@example.com",
                             FirstName = "Carol",
                             LastName = "Williams",
@@ -204,6 +220,7 @@ namespace StakeholderApi.Migrations
                         {
                             Id = 14,
                             CreatedAt = new DateTime(2024, 4, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            UpdatedAt = new DateTime(2024, 4, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Email = "david.williams@example.com",
                             FirstName = "David",
                             LastName = "Williams",
@@ -215,6 +232,7 @@ namespace StakeholderApi.Migrations
                         {
                             Id = 15,
                             CreatedAt = new DateTime(2024, 4, 8, 0, 0, 0, 0, DateTimeKind.Utc),
+                            UpdatedAt = new DateTime(2024, 4, 8, 0, 0, 0, 0, DateTimeKind.Utc),
                             Email = "eva.williams@example.com",
                             FirstName = "Eva",
                             LastName = "Williams",
@@ -226,6 +244,7 @@ namespace StakeholderApi.Migrations
                         {
                             Id = 16,
                             CreatedAt = new DateTime(2024, 4, 15, 0, 0, 0, 0, DateTimeKind.Utc),
+                            UpdatedAt = new DateTime(2024, 4, 15, 0, 0, 0, 0, DateTimeKind.Utc),
                             Email = "frank.williams@example.com",
                             FirstName = "Frank",
                             LastName = "Williams",
@@ -237,6 +256,7 @@ namespace StakeholderApi.Migrations
                         {
                             Id = 17,
                             CreatedAt = new DateTime(2024, 4, 22, 0, 0, 0, 0, DateTimeKind.Utc),
+                            UpdatedAt = new DateTime(2024, 4, 22, 0, 0, 0, 0, DateTimeKind.Utc),
                             Email = "grace.williams@example.com",
                             FirstName = "Grace",
                             LastName = "Williams",
@@ -248,6 +268,7 @@ namespace StakeholderApi.Migrations
                         {
                             Id = 18,
                             CreatedAt = new DateTime(2024, 4, 29, 0, 0, 0, 0, DateTimeKind.Utc),
+                            UpdatedAt = new DateTime(2024, 4, 29, 0, 0, 0, 0, DateTimeKind.Utc),
                             Email = "henry.williams@example.com",
                             FirstName = "Henry",
                             LastName = "Williams",
@@ -259,6 +280,7 @@ namespace StakeholderApi.Migrations
                         {
                             Id = 19,
                             CreatedAt = new DateTime(2024, 5, 6, 0, 0, 0, 0, DateTimeKind.Utc),
+                            UpdatedAt = new DateTime(2024, 5, 6, 0, 0, 0, 0, DateTimeKind.Utc),
                             Email = "isla.williams@example.com",
                             FirstName = "Isla",
                             LastName = "Williams",
@@ -270,6 +292,7 @@ namespace StakeholderApi.Migrations
                         {
                             Id = 20,
                             CreatedAt = new DateTime(2024, 5, 13, 0, 0, 0, 0, DateTimeKind.Utc),
+                            UpdatedAt = new DateTime(2024, 5, 13, 0, 0, 0, 0, DateTimeKind.Utc),
                             Email = "james.williams@example.com",
                             FirstName = "James",
                             LastName = "Williams",
@@ -281,6 +304,7 @@ namespace StakeholderApi.Migrations
                         {
                             Id = 21,
                             CreatedAt = new DateTime(2024, 5, 20, 0, 0, 0, 0, DateTimeKind.Utc),
+                            UpdatedAt = new DateTime(2024, 5, 20, 0, 0, 0, 0, DateTimeKind.Utc),
                             Email = "alice.smith@example.com",
                             FirstName = "Alice",
                             LastName = "Smith",
@@ -292,6 +316,7 @@ namespace StakeholderApi.Migrations
                         {
                             Id = 22,
                             CreatedAt = new DateTime(2024, 5, 27, 0, 0, 0, 0, DateTimeKind.Utc),
+                            UpdatedAt = new DateTime(2024, 5, 27, 0, 0, 0, 0, DateTimeKind.Utc),
                             Email = "bob.smith@example.com",
                             FirstName = "Bob",
                             LastName = "Smith",
@@ -303,6 +328,7 @@ namespace StakeholderApi.Migrations
                         {
                             Id = 23,
                             CreatedAt = new DateTime(2024, 6, 3, 0, 0, 0, 0, DateTimeKind.Utc),
+                            UpdatedAt = new DateTime(2024, 6, 3, 0, 0, 0, 0, DateTimeKind.Utc),
                             Email = "carol.smith@example.com",
                             FirstName = "Carol",
                             LastName = "Smith",
@@ -314,6 +340,7 @@ namespace StakeholderApi.Migrations
                         {
                             Id = 24,
                             CreatedAt = new DateTime(2024, 6, 10, 0, 0, 0, 0, DateTimeKind.Utc),
+                            UpdatedAt = new DateTime(2024, 6, 10, 0, 0, 0, 0, DateTimeKind.Utc),
                             Email = "david.smith@example.com",
                             FirstName = "David",
                             LastName = "Smith",
@@ -325,6 +352,7 @@ namespace StakeholderApi.Migrations
                         {
                             Id = 25,
                             CreatedAt = new DateTime(2024, 6, 17, 0, 0, 0, 0, DateTimeKind.Utc),
+                            UpdatedAt = new DateTime(2024, 6, 17, 0, 0, 0, 0, DateTimeKind.Utc),
                             Email = "eva.smith@example.com",
                             FirstName = "Eva",
                             LastName = "Smith",
@@ -336,6 +364,7 @@ namespace StakeholderApi.Migrations
                         {
                             Id = 26,
                             CreatedAt = new DateTime(2024, 6, 24, 0, 0, 0, 0, DateTimeKind.Utc),
+                            UpdatedAt = new DateTime(2024, 6, 24, 0, 0, 0, 0, DateTimeKind.Utc),
                             Email = "frank.smith@example.com",
                             FirstName = "Frank",
                             LastName = "Smith",
@@ -347,6 +376,7 @@ namespace StakeholderApi.Migrations
                         {
                             Id = 27,
                             CreatedAt = new DateTime(2024, 7, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            UpdatedAt = new DateTime(2024, 7, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Email = "grace.smith@example.com",
                             FirstName = "Grace",
                             LastName = "Smith",
@@ -358,6 +388,7 @@ namespace StakeholderApi.Migrations
                         {
                             Id = 28,
                             CreatedAt = new DateTime(2024, 7, 8, 0, 0, 0, 0, DateTimeKind.Utc),
+                            UpdatedAt = new DateTime(2024, 7, 8, 0, 0, 0, 0, DateTimeKind.Utc),
                             Email = "henry.smith@example.com",
                             FirstName = "Henry",
                             LastName = "Smith",
@@ -369,6 +400,7 @@ namespace StakeholderApi.Migrations
                         {
                             Id = 29,
                             CreatedAt = new DateTime(2024, 7, 15, 0, 0, 0, 0, DateTimeKind.Utc),
+                            UpdatedAt = new DateTime(2024, 7, 15, 0, 0, 0, 0, DateTimeKind.Utc),
                             Email = "isla.smith@example.com",
                             FirstName = "Isla",
                             LastName = "Smith",
@@ -380,6 +412,7 @@ namespace StakeholderApi.Migrations
                         {
                             Id = 30,
                             CreatedAt = new DateTime(2024, 7, 22, 0, 0, 0, 0, DateTimeKind.Utc),
+                            UpdatedAt = new DateTime(2024, 7, 22, 0, 0, 0, 0, DateTimeKind.Utc),
                             Email = "james.smith@example.com",
                             FirstName = "James",
                             LastName = "Smith",
@@ -391,6 +424,7 @@ namespace StakeholderApi.Migrations
                         {
                             Id = 31,
                             CreatedAt = new DateTime(2024, 7, 29, 0, 0, 0, 0, DateTimeKind.Utc),
+                            UpdatedAt = new DateTime(2024, 7, 29, 0, 0, 0, 0, DateTimeKind.Utc),
                             Email = "alice.brown@example.com",
                             FirstName = "Alice",
                             LastName = "Brown",
@@ -402,6 +436,7 @@ namespace StakeholderApi.Migrations
                         {
                             Id = 32,
                             CreatedAt = new DateTime(2024, 8, 5, 0, 0, 0, 0, DateTimeKind.Utc),
+                            UpdatedAt = new DateTime(2024, 8, 5, 0, 0, 0, 0, DateTimeKind.Utc),
                             Email = "bob.brown@example.com",
                             FirstName = "Bob",
                             LastName = "Brown",
@@ -413,6 +448,7 @@ namespace StakeholderApi.Migrations
                         {
                             Id = 33,
                             CreatedAt = new DateTime(2024, 8, 12, 0, 0, 0, 0, DateTimeKind.Utc),
+                            UpdatedAt = new DateTime(2024, 8, 12, 0, 0, 0, 0, DateTimeKind.Utc),
                             Email = "carol.brown@example.com",
                             FirstName = "Carol",
                             LastName = "Brown",
@@ -424,6 +460,7 @@ namespace StakeholderApi.Migrations
                         {
                             Id = 34,
                             CreatedAt = new DateTime(2024, 8, 19, 0, 0, 0, 0, DateTimeKind.Utc),
+                            UpdatedAt = new DateTime(2024, 8, 19, 0, 0, 0, 0, DateTimeKind.Utc),
                             Email = "david.brown@example.com",
                             FirstName = "David",
                             LastName = "Brown",
@@ -435,6 +472,7 @@ namespace StakeholderApi.Migrations
                         {
                             Id = 35,
                             CreatedAt = new DateTime(2024, 8, 26, 0, 0, 0, 0, DateTimeKind.Utc),
+                            UpdatedAt = new DateTime(2024, 8, 26, 0, 0, 0, 0, DateTimeKind.Utc),
                             Email = "eva.brown@example.com",
                             FirstName = "Eva",
                             LastName = "Brown",
@@ -446,6 +484,7 @@ namespace StakeholderApi.Migrations
                         {
                             Id = 36,
                             CreatedAt = new DateTime(2024, 9, 2, 0, 0, 0, 0, DateTimeKind.Utc),
+                            UpdatedAt = new DateTime(2024, 9, 2, 0, 0, 0, 0, DateTimeKind.Utc),
                             Email = "frank.brown@example.com",
                             FirstName = "Frank",
                             LastName = "Brown",
@@ -457,6 +496,7 @@ namespace StakeholderApi.Migrations
                         {
                             Id = 37,
                             CreatedAt = new DateTime(2024, 9, 9, 0, 0, 0, 0, DateTimeKind.Utc),
+                            UpdatedAt = new DateTime(2024, 9, 9, 0, 0, 0, 0, DateTimeKind.Utc),
                             Email = "grace.brown@example.com",
                             FirstName = "Grace",
                             LastName = "Brown",
@@ -468,6 +508,7 @@ namespace StakeholderApi.Migrations
                         {
                             Id = 38,
                             CreatedAt = new DateTime(2024, 9, 16, 0, 0, 0, 0, DateTimeKind.Utc),
+                            UpdatedAt = new DateTime(2024, 9, 16, 0, 0, 0, 0, DateTimeKind.Utc),
                             Email = "henry.brown@example.com",
                             FirstName = "Henry",
                             LastName = "Brown",
@@ -479,6 +520,7 @@ namespace StakeholderApi.Migrations
                         {
                             Id = 39,
                             CreatedAt = new DateTime(2024, 9, 23, 0, 0, 0, 0, DateTimeKind.Utc),
+                            UpdatedAt = new DateTime(2024, 9, 23, 0, 0, 0, 0, DateTimeKind.Utc),
                             Email = "isla.brown@example.com",
                             FirstName = "Isla",
                             LastName = "Brown",
@@ -490,6 +532,7 @@ namespace StakeholderApi.Migrations
                         {
                             Id = 40,
                             CreatedAt = new DateTime(2024, 9, 30, 0, 0, 0, 0, DateTimeKind.Utc),
+                            UpdatedAt = new DateTime(2024, 9, 30, 0, 0, 0, 0, DateTimeKind.Utc),
                             Email = "james.brown@example.com",
                             FirstName = "James",
                             LastName = "Brown",
@@ -501,6 +544,7 @@ namespace StakeholderApi.Migrations
                         {
                             Id = 41,
                             CreatedAt = new DateTime(2024, 10, 7, 0, 0, 0, 0, DateTimeKind.Utc),
+                            UpdatedAt = new DateTime(2024, 10, 7, 0, 0, 0, 0, DateTimeKind.Utc),
                             Email = "alice.taylor@example.com",
                             FirstName = "Alice",
                             LastName = "Taylor",
@@ -512,6 +556,7 @@ namespace StakeholderApi.Migrations
                         {
                             Id = 42,
                             CreatedAt = new DateTime(2024, 10, 14, 0, 0, 0, 0, DateTimeKind.Utc),
+                            UpdatedAt = new DateTime(2024, 10, 14, 0, 0, 0, 0, DateTimeKind.Utc),
                             Email = "bob.taylor@example.com",
                             FirstName = "Bob",
                             LastName = "Taylor",
@@ -523,6 +568,7 @@ namespace StakeholderApi.Migrations
                         {
                             Id = 43,
                             CreatedAt = new DateTime(2024, 10, 21, 0, 0, 0, 0, DateTimeKind.Utc),
+                            UpdatedAt = new DateTime(2024, 10, 21, 0, 0, 0, 0, DateTimeKind.Utc),
                             Email = "carol.taylor@example.com",
                             FirstName = "Carol",
                             LastName = "Taylor",
@@ -534,6 +580,7 @@ namespace StakeholderApi.Migrations
                         {
                             Id = 44,
                             CreatedAt = new DateTime(2024, 10, 28, 0, 0, 0, 0, DateTimeKind.Utc),
+                            UpdatedAt = new DateTime(2024, 10, 28, 0, 0, 0, 0, DateTimeKind.Utc),
                             Email = "david.taylor@example.com",
                             FirstName = "David",
                             LastName = "Taylor",
@@ -545,6 +592,7 @@ namespace StakeholderApi.Migrations
                         {
                             Id = 45,
                             CreatedAt = new DateTime(2024, 11, 4, 0, 0, 0, 0, DateTimeKind.Utc),
+                            UpdatedAt = new DateTime(2024, 11, 4, 0, 0, 0, 0, DateTimeKind.Utc),
                             Email = "eva.taylor@example.com",
                             FirstName = "Eva",
                             LastName = "Taylor",
@@ -556,6 +604,7 @@ namespace StakeholderApi.Migrations
                         {
                             Id = 46,
                             CreatedAt = new DateTime(2024, 11, 11, 0, 0, 0, 0, DateTimeKind.Utc),
+                            UpdatedAt = new DateTime(2024, 11, 11, 0, 0, 0, 0, DateTimeKind.Utc),
                             Email = "frank.taylor@example.com",
                             FirstName = "Frank",
                             LastName = "Taylor",
@@ -567,6 +616,7 @@ namespace StakeholderApi.Migrations
                         {
                             Id = 47,
                             CreatedAt = new DateTime(2024, 11, 18, 0, 0, 0, 0, DateTimeKind.Utc),
+                            UpdatedAt = new DateTime(2024, 11, 18, 0, 0, 0, 0, DateTimeKind.Utc),
                             Email = "grace.taylor@example.com",
                             FirstName = "Grace",
                             LastName = "Taylor",
@@ -578,6 +628,7 @@ namespace StakeholderApi.Migrations
                         {
                             Id = 48,
                             CreatedAt = new DateTime(2024, 11, 25, 0, 0, 0, 0, DateTimeKind.Utc),
+                            UpdatedAt = new DateTime(2024, 11, 25, 0, 0, 0, 0, DateTimeKind.Utc),
                             Email = "henry.taylor@example.com",
                             FirstName = "Henry",
                             LastName = "Taylor",
@@ -589,6 +640,7 @@ namespace StakeholderApi.Migrations
                         {
                             Id = 49,
                             CreatedAt = new DateTime(2024, 12, 2, 0, 0, 0, 0, DateTimeKind.Utc),
+                            UpdatedAt = new DateTime(2024, 12, 2, 0, 0, 0, 0, DateTimeKind.Utc),
                             Email = "isla.taylor@example.com",
                             FirstName = "Isla",
                             LastName = "Taylor",
@@ -600,6 +652,7 @@ namespace StakeholderApi.Migrations
                         {
                             Id = 50,
                             CreatedAt = new DateTime(2024, 12, 9, 0, 0, 0, 0, DateTimeKind.Utc),
+                            UpdatedAt = new DateTime(2024, 12, 9, 0, 0, 0, 0, DateTimeKind.Utc),
                             Email = "james.taylor@example.com",
                             FirstName = "James",
                             LastName = "Taylor",

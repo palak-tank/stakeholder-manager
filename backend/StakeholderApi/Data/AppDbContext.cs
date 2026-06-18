@@ -38,6 +38,7 @@ public class AppDbContext : DbContext
             var firstName = firstNames[i % firstNames.Length];
             var lastName  = lastNames[i / firstNames.Length];
 
+            var createdAt = startDate.AddDays(i * 7);
             stakeholders.Add(new Stakeholder
             {
                 Id           = i + 1,
@@ -46,7 +47,8 @@ public class AppDbContext : DbContext
                 Email        = $"{firstName.ToLower()}.{lastName.ToLower()}@example.com",
                 Role         = roles[i % roles.Length],
                 Organisation = orgs[i % orgs.Length],
-                CreatedAt    = startDate.AddDays(i * 7),
+                CreatedAt    = createdAt,
+                UpdatedAt    = createdAt,
                 Title        = i % 2 == 0 ? "Ms" : "Mr",
             });
         }

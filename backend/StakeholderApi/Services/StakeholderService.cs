@@ -17,7 +17,7 @@ public class StakeholderService : IStakeholderService
     {
         var total = await _context.Stakeholders.CountAsync();
         var items = await _context.Stakeholders
-            .OrderBy(s => s.LastName)
+            .OrderByDescending(s => s.UpdatedAt)
             .Skip(page * pageSize)
             .Take(pageSize)
             .ToListAsync();
@@ -38,6 +38,7 @@ public class StakeholderService : IStakeholderService
             throw new InvalidOperationException($"A stakeholder with email '{stakeholder.Email}' already exists.");
 
         stakeholder.CreatedAt = DateTime.UtcNow;
+        stakeholder.UpdatedAt = DateTime.UtcNow;
         _context.Stakeholders.Add(stakeholder);
         await _context.SaveChangesAsync();
         return stakeholder;
@@ -64,6 +65,7 @@ public class StakeholderService : IStakeholderService
         stakeholder.Role = request.Role;
         stakeholder.Organisation = request.Organisation;
         stakeholder.Title = request.Title;
+        stakeholder.UpdatedAt = DateTime.UtcNow;
 
         await _context.SaveChangesAsync();
         return stakeholder;
